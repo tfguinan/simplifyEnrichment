@@ -56,7 +56,13 @@ GO_similarity = function(go_id, ont = NULL, db = "org.Hs.eg.db", measure = "Sim_
 		dag = env$go[[hash]]$dag
 		all_go_id = env$go[[hash]]$all_go_id
 	}
+    
+    go_removed = setdiff(go_id, all_go_id)
+	if(length(go_removed)) {
+		message(qq("@{length(go_removed)}/@{length(go_id)} GO term@{ifelse(length(go_removed) == 1, ' is', 's are')} removed."))
+	}
 
+	go_id = intersect(go_id, all_go_id)
 	go_sim = term_sim(dag, go_id, method = measure)
 
 	attr(go_sim, "measure") = measure
