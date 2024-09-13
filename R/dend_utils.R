@@ -11,44 +11,48 @@ next_k = local({
 	}
 })
 
-# == title
-# Apply functions on every node in a dendrogram
-#
-# == param
-# -dend A dendrogram.
-# -fun A self-defined function.
-#
-# == details
-# The function returns a vector or a list as the same length as the number of nodes in the dendrogram.
-#
-# The self-defined function can have one single argument which is the sub-dendrogram at a certain node.
-# E.g. to get the number of members at every node:
-#
-#     dend_node_apply(dend, function(d) attr(d, "members"))
-#
-# The self-defined function can have a second argument, which is the index of current sub-dendrogram in 
-# the complete dendrogram. E.g. ``dend[[1]]`` is the first child node of the complete dendrogram and
-# ``dend[[c(1, 2)]]`` is the second child node of ``dend[[1]]``, et al. This makes that at a certain node,
-# it is possible to get information of its child nodes and parent nodes. 
-#
-#     dend_node_apply(dend, function(d, index) {
-#         dend[[c(index, 1)]] # is the first child node of d, or simply d[[1]]
-#         dend[[index[-length(index)]]] # is the parent node of d
-#         ...
-#     })
-#
-# Note for the top node, the value of ``index`` is ``NULL``.
-#
-# == value
-# A vector or a list, depends on whether ``fun`` returns a scalar or more complex values.
-#
-# == example
-# mat = matrix(rnorm(100), 10)
-# dend = as.dendrogram(hclust(dist(mat)))
-# # number of members on every node
-# dend_node_apply(dend, function(d) attr(d, "members"))
-# # the depth on every node
-# dend_node_apply(dend, function(d, index) length(index))
+#' Apply functions on every node in a dendrogram
+#' 
+#' @rdname dend
+#'
+#' @param dend A `dendrogram` object.
+#' @param fun A self-defined function.
+#'
+#' @details
+#' `dend_node_apply()` returns a vector or a list as the same length as the number of nodes in the dendrogram.
+#'
+#' The self-defined function can have one single argument which is the sub-dendrogram at a certain node.
+#' E.g. to get the number of members at every node:
+#'
+#' ```
+#' dend_node_apply(dend, function(d) attr(d, "members"))
+#' ```
+#' 
+#' The self-defined function can have a second argument, which is the index of current sub-dendrogram in 
+#' the complete dendrogram. E.g. `dend[[1]]` is the first child node of the complete dendrogram and
+#' `dend[[c(1, 2)]]` is the second child node of `dend[[1]]`, et al. This makes that at a certain node,
+#' it is possible to get information of its child nodes and parent nodes. 
+#'
+#' ```
+#' dend_node_apply(dend, function(d, index) {
+#'     dend[[c(index, 1)]] # is the first child node of d, or simply d[[1]]
+#'     dend[[index[-length(index)]]] # is the parent node of d
+#'     ...
+#' })
+#' ```
+#'
+#' Note for the top node, the value of `index` is `NULL`.
+#'
+#' @return
+#' `dend_node_apply()` returns a vector or a list, depends on whether `fun` returns a scalar or more complex values.
+#' @export
+#' @examples
+#' mat = matrix(rnorm(100), 10)
+#' dend = as.dendrogram(hclust(dist(mat)))
+#' # number of members on every node
+#' dend_node_apply(dend, function(d) attr(d, "members"))
+#' # the depth on every node
+#' dend_node_apply(dend, function(d, index) length(index))
 dend_node_apply = function(dend, fun) {
 
 	next_k(reset = TRUE)
@@ -109,48 +113,47 @@ dend_node_apply = function(dend, fun) {
 }
 
 
-# == title
-# Modify nodes in a dendrogram
-#
-# == param
-# -dend A dendrogram.
-# -fun A self-defined function.
-#
-# == details
-# if ``fun`` only has one argument, it is basically the same as `stats::dendrapply`,
-# but it can have a second argument which is the index of the node in the dendrogram,
-# which makes it possible to get information of child nodes and parent nodes for
-# a specific node.
-#
-# As an example, we first assign random values to every node in the dendrogram:
-#
-#     mat = matrix(rnorm(100), 10)
-#     dend = as.dendrogram(hclust(dist(mat)))
-#     dend = edit_node(dend, function(d) {attr(d, 'score') = runif(1); d})
-#
-# Then for every node, we take the maximal absolute difference to all its child nodes
-# and parent node as the attribute ``abs_diff``
-#
-#     dend = edit_node(dend, function(d, index) {
-#         n = length(index)
-#         s = attr(d, "score")
-#         if(is.null(index)) {  # d is the top node
-#             s_children = sapply(d, function(x) attr(x, "score"))
-#             s_parent = NULL
-#         } else if(is.leaf(d)) { # d is the leaf
-#             s_children = NULL
-#             s_parent = attr(dend[[index[-n]]], "score")
-#         } else {
-#             s_children = sapply(d, function(x) attr(x, "score"))
-#             s_parent = attr(dend[[index[-n]]], "score")
-#         }
-#         abs_diff = max(abs(s - c(s_children, s_parent)))
-#         attr(d, "abs_diff") = abs_diff
-#         return(d)
-#     })
-#
-# == value
-# A dendrogram object.
+#' @rdname dend
+#'
+#' @details
+#' In `edit_node()`, if `fun` only has one argument, it is basically the same as [`stats::dendrapply()`],
+#' but it can have a second argument which is the index of the node in the dendrogram,
+#' which makes it possible to get information of child nodes and parent nodes for
+#' a specific node.
+#'
+#' As an example, we first assign random values to every node in the dendrogram:
+#'
+#' ```
+#' mat = matrix(rnorm(100), 10)
+#' dend = as.dendrogram(hclust(dist(mat)))
+#' dend = edit_node(dend, function(d) {attr(d, 'score') = runif(1); d})
+#' ````
+#'
+#' Then for every node, we take the maximal absolute difference to all its child nodes
+#' and parent node as the attribute `abs_diff`.
+#'
+#' ```
+#' dend = edit_node(dend, function(d, index) {
+#'     n = length(index)
+#'     s = attr(d, "score")
+#'     if(is.null(index)) {  # d is the top node
+#'         s_children = sapply(d, function(x) attr(x, "score"))
+#'         s_parent = NULL
+#'     } else if(is.leaf(d)) { # d is the leaf
+#'         s_children = NULL
+#'         s_parent = attr(dend[[index[-n]]], "score")
+#'     } else {
+#'         s_children = sapply(d, function(x) attr(x, "score"))
+#'         s_parent = attr(dend[[index[-n]]], "score")
+#'     }
+#'     abs_diff = max(abs(s - c(s_children, s_parent)))
+#'     attr(d, "abs_diff") = abs_diff
+#'     return(d)
+#' })
+#' ```
+#'
+#' @return
+#' `edit_node()` returns a `dendrogram` object.
 edit_node = function(dend, fun = function(d, index) d) {
 
 	# breadth first
@@ -163,7 +166,7 @@ edit_node = function(dend, fun = function(d, index) d) {
 		fun = function(d, index) fun2(d)
 	}
 
-	traversal_dend = function(env, index = NULL) {
+	traverse_dend = function(env, index = NULL) {
 		# index is null means it is the top node
 		if(is.null(index)) {
 			d = env$dend
@@ -174,7 +177,7 @@ edit_node = function(dend, fun = function(d, index) d) {
 				env$dend = fun(d, NULL)
 
 				for(i in seq_along(d)) {
-					traversal_dend(env, i)
+					traverse_dend(env, i)
 				}
 			}
 		} else {
@@ -185,12 +188,12 @@ edit_node = function(dend, fun = function(d, index) d) {
 			} else {
 				env$dend[[index]] = fun(d, index)
 				for(i in seq_along(d)) {
-					traversal_dend(env, c(index, i))
+					traverse_dend(env, c(index, i))
 				}
 			}
 		}
 	}
 
-	traversal_dend(env)
+	traverse_dend(env)
 	return(env$dend)
 }

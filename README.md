@@ -30,12 +30,6 @@ library(devtools)
 install_github("jokergoo/simplifyEnrichment")
 ```
 
-### Vignette
-
-- [Simplify Functional Enrichment Results](https://jokergoo.github.io/simplifyEnrichment/articles/simplifyEnrichment.html)
-- [Word Cloud Annotation](https://jokergoo.github.io/simplifyEnrichment/articles/word_cloud_anno.html)
-- [A Shiny app to interactively visualize clustering results](https://jokergoo.github.io/simplifyEnrichment/articles/interactive.html)
-
 ### Usage
 
 As an example, I first generate a list of random GO IDs.
@@ -56,13 +50,8 @@ mat = GO_similarity(go_id)
 simplifyGO(mat)
 ```
 
-![image](https://user-images.githubusercontent.com/449218/89673686-133c8600-d8e7-11ea-89fe-5221cb64d819.png)
+![](https://user-images.githubusercontent.com/449218/89673686-133c8600-d8e7-11ea-89fe-5221cb64d819.png)
 
-### Examples
-
-- [Examples of simplifyEnrichment](https://simplifyenrichment.github.io/examples/)
-- [Compare different similarity measures for functional terms](https://simplifyenrichment.github.io/compare_similarity/)
-- [Compare different partitioning methods in binary cut clustering](https://simplifyenrichment.github.io/test_partition_methods/)
 
 ### License
 

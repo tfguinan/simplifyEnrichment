@@ -1,3 +1,10 @@
+CHANGES in VERSION 2.0.0
+
+* use **simona** for semantic similarity calculation
+* removed similarity functions for DO and based on overlaps (the count)
+
+-----------------------------
+
 CHANGES in VERSION 1.9.1
 
 * `term_similarity_from_gmt()`: previously forgot to split rows.

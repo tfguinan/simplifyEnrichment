@@ -1,39 +1,32 @@
 
-# == title
-# Apply various clustering methods
-#
-# == param
-# -mat The similarity matrix.
-# -method Which methods to compare. All available methods are in `all_clustering_methods`.
-#         A value of ``all`` takes all available methods. By default ``mclust`` is excluded because its long runtime.
-# -verbose Whether to print messages.
-#
-# == details
-# The function compares following default clustering methods by default:
-#
-# -``kmeans`` see `cluster_by_kmeans`.
-# -``pam`` see `cluster_by_pam`.
-# -``dynamicTreeCut`` see `cluster_by_dynamicTreeCut`.
-# -``mclust`` see `cluster_by_mclust`. By default it is not included.
-# -``apcluster`` see `cluster_by_apcluster`.
-# -``hdbscan`` see `cluster_by_hdbscan`.
-# -``fast_greedy`` see `cluster_by_igraph`.
-# -``louvain`` see `cluster_by_igraph`.
-# -``walktrap`` see `cluster_by_igraph`.
-# -``MCL`` see `cluster_by_MCL`.
-# -``binary_cut`` see `binary_cut`.
-#
-# Also the user-defined methods in `all_clustering_methods` are also compared.
-#
-# == value
-# A list of cluster label vectors for different clustering methods.
-#
-# == examples
-# \dontrun{
-# mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
-#     package = "simplifyEnrichment"))
-# clt = cmp_make_clusters(mat)
-# }
+#' Compare clustering methods
+#'
+#' @rdname compare
+#' @param mat The similarity matrix.
+#' @param method Which methods to compare. All available methods are in [`all_clustering_methods()`].
+#'         A value of `"all"` takes all available methods. By default "mclust" is excluded because its long runtime.
+#' @param verbose Whether to print messages.
+#'
+#' Ddetails
+#' The function compares following default clustering methods by default:
+#'
+#' -``kmeans`` see `cluster_by_kmeans`.
+#' -``pam`` see `cluster_by_pam`.
+#' -``dynamicTreeCut`` see `cluster_by_dynamicTreeCut`.
+#' -``mclust`` see `cluster_by_mclust`. By default it is not included.
+#' -``apcluster`` see `cluster_by_apcluster`.
+#' -``hdbscan`` see `cluster_by_hdbscan`.
+#' -``fast_greedy`` see `cluster_by_fast_greedy`.
+#' -``louvain`` see `cluster_by_louvain`.
+#' -``walktrap`` see `cluster_by_walktrap`.
+#' -``MCL`` see `cluster_by_MCL`.
+#' -``binary_cut`` see `binary_cut`.
+#'
+#' Also the user-defined methods in `all_clustering_methods` are also compared.
+#'
+#' @return
+#' `cmp_make_clusters()` returns a list of cluster label vectors from different clustering methods.
+#' @export
 cmp_make_clusters = function(mat, method = setdiff(all_clustering_methods(), "mclust"),
 	verbose = TRUE) {
 
@@ -56,39 +49,27 @@ cmp_make_clusters = function(mat, method = setdiff(all_clustering_methods(), "mc
 	clt
 }
 
-# == title
-# Make plots for comparing clustering methods
-#
-# == param
-# -mat A similarity matrix.
-# -clt A list of clusterings from `cmp_make_clusters`.
-# -plot_type What type of plots to make. See Details.
-# -nrow Number of rows of the layout when ``plot_type`` is set to ``heatmap``.
-#
-# == details
-# If ``plot_type`` is the default value ``mixed``, a figure with three panels generated:
-#
-# - A heatmap of the similarity matrix with different classifications as row annotations.
-# - A heatmap of the pair-wise concordance of the classifications of every two clustering methods.
-# - Barplots of the difference scores for each method (calculated by `difference_score`), the number
-#    of clusters (total clusters and the clusters with size >= 5) and the mean similarity of the terms 
-#    that are in the same clusters.
-#
-# If ``plot_type`` is ``heatmap``. There are heatmaps for the similarity matrix under clusterings
-# from different methods. The last panel is a table with the number of clusters under different
-# clusterings.
-#
-# == value
-# No value is returned.
-#
-# == examples
-# \dontrun{
-# mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
-#     package = "simplifyEnrichment"))
-# clt = cmp_make_clusters(mat)
-# cmp_make_plot(mat, clt)
-# cmp_make_plot(mat, clt, plot_type = "heatmap")
-# }
+#' @rdname compare
+#' @param clt A list of clusterings from `cmp_make_clusters()`.
+#' @param plot_type What type of plots to make. See **Details**.
+#' @param nrow Number of rows of the layout when ``plot_type`` is set to `"heatmap"`.
+#'
+#' @details
+#' For `cmp_make_plot()`, if `plot_type` is the default value `"mixed"`, a figure with three panels will be generated:
+#'
+#' - A heatmap of the similarity matrix with different classifications as row annotations.
+#' - A heatmap of the pair-wise concordance of the classifications of every two clustering methods.
+#' - Barplots of the difference scores for each method (calculated by `difference_score`), the number
+#'    of clusters (total clusters and the clusters with size >= 5) and the mean similarity of the terms 
+#'    that are in the same clusters.
+#'
+#' If `plot_type` is `"heatmap"`. There are heatmaps for the similarity matrix under clusterings
+#' from different methods. The last panel is a table with the number of clusters under different
+#' clusterings.
+#'
+#' @return
+#' `cmp_make_plot()` returns no value.
+#' @export
 cmp_make_plot = function(mat, clt, plot_type = c("mixed", "heatmap"), nrow = 3) {
 
 	clt = as.data.frame(clt)
@@ -268,47 +249,20 @@ cmp_calc_stats = function(mat, clt) {
 	return(x)
 }
 
-# == title
-# Compare clustering methods
-#
-# == param
-# -mat The similarity matrix.
-# -method Which methods to compare. All available methods are in `all_clustering_methods`.
-#         A value of ``all`` takes all available methods. By default ``mclust`` is excluded because its long runtime.
-# -plot_type See explanation in `cmp_make_plot`.
-# -nrow Number of rows of the layout when ``plot_type`` is set to ``heatmap``.
-# -verbose Whether to print messages.
-#
-# == details
-# The function compares following clustering methods by default:
-#
-# -``kmeans`` see `cluster_by_kmeans`.
-# -``pam`` see `cluster_by_pam`.
-# -``dynamicTreeCut`` see `cluster_by_dynamicTreeCut`.
-# -``mclust`` see `cluster_by_mclust`. By default it is not included.
-# -``apcluster`` see `cluster_by_apcluster`.
-# -``hdbscan`` see `cluster_by_hdbscan`.
-# -``fast_greedy`` see `cluster_by_igraph`.
-# -``louvain`` see `cluster_by_igraph`.
-# -``walktrap`` see `cluster_by_igraph`.
-# -``MCL`` see `cluster_by_MCL`.
-# -``binary_cut`` see `binary_cut`.
-#
-# This functon is basically a wrapper function. It calls the following two functions:
-#
-# - `cmp_make_clusters`: applies clustering with different methods.
-# - `cmp_make_plot`: makes the plots.
-#
-# == value
-# No value is returned.
-#
-# == example
-# \dontrun{
-# mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
-#     package = "simplifyEnrichment"))
-# compare_clustering_methods(mat)
-# compare_clustering_methods(mat, plot_type = "heatmap")
-# }
+#' @rdname compare
+#' @details
+#' `compare_clustering_methods()` is basically a wrapper function of `cmp_make_clusters()` and `cmp_make_plot()`.
+#'
+#' @return
+#' `compare_clustering_methods()` returns no value.
+#' @export
+#' @examples
+#' \donttest{
+#' mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
+#'     package = "simplifyEnrichment"))
+#' compare_clustering_methods(mat)
+#' compare_clustering_methods(mat, plot_type = "heatmap")
+#' }
 compare_clustering_methods = function(mat, method = setdiff(all_clustering_methods(), "mclust"),
 	plot_type = c("mixed", "heatmap"), nrow = 3, verbose = TRUE) {
 

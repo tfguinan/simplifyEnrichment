@@ -1,18 +1,18 @@
 
-# == title
-# Interactively visualize the similarity heatmap
-#
-# == param
-# -mat A similarity matrix.
-# -cl Cluster labels inferred from the similarity matrix, e.g. from `cluster_terms` or `binary_cut`.
-#
-# == example
-# if(interactive()) {
-#     mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", 
-#         package = "simplifyEnrichment"))
-#     cl = binary_cut(mat)
-#     export_to_shiny_app(mat, cl)
-# }
+#' Interactively visualize the similarity heatmap
+#'
+#' @param mat A similarity matrix.
+#' @param cl Cluster labels inferred from the similarity matrix, e.g. from [`cluster_terms()`] or [`binary_cut()`].
+#' @return A shiny application.
+#' @export
+#' @import GO.db
+#' @examples
+#' if(interactive()) {
+#'     mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", 
+#'         package = "simplifyEnrichment"))
+#'     cl = binary_cut(mat)
+#'     export_to_shiny_app(mat, cl)
+#' }
 export_to_shiny_app = function(mat, cl = binary_cut(mat)) {
 
 	check_pkg("shiny")

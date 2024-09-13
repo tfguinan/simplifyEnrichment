@@ -16,7 +16,13 @@
     <loc>/articles/simplifyEnrichment.html</loc>
   </url>
   <url>
+    <loc>/articles/simplifyEnrichment_intro.html</loc>
+  </url>
+  <url>
     <loc>/articles/simplifyGO.html</loc>
+  </url>
+  <url>
+    <loc>/articles/summarize.html</loc>
   </url>
   <url>
     <loc>/articles/word_cloud_anno.html</loc>
@@ -76,6 +82,9 @@
     <loc>/reference/cluster_by_pam.html</loc>
   </url>
   <url>
+    <loc>/reference/cluster_methods.html</loc>
+  </url>
+  <url>
     <loc>/reference/cluster_terms.html</loc>
   </url>
   <url>
@@ -83,6 +92,9 @@
   </url>
   <url>
     <loc>/reference/cmp_make_plot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/compare.html</loc>
   </url>
   <url>
     <loc>/reference/compare_clustering_methods.html</loc>
@@ -104,6 +116,9 @@
   </url>
   <url>
     <loc>/reference/count_words.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dend.html</loc>
   </url>
   <url>
     <loc>/reference/dend_node_apply.html</loc>
@@ -134,6 +149,9 @@
   </url>
   <url>
     <loc>/reference/keyword_enrichment_from_GO.html</loc>
+  </url>
+  <url>
+    <loc>/reference/node_partition.html</loc>
   </url>
   <url>
     <loc>/reference/partition_by_hclust.html</loc>
@@ -185,6 +203,9 @@
   </url>
   <url>
     <loc>/reference/subset_enrichResult.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summarizeGO.html</loc>
   </url>
   <url>
     <loc>/reference/term_similarity.html</loc>

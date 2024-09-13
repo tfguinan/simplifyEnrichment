@@ -26,33 +26,30 @@ get_clustering_method = function(method, control = list()) {
 	return(fun2)
 }
 
-# == title
-# Register new clustering methods
-#
-# == param
-# -... A named list of clustering functions, see Details.
-#
-# == details
-# The user-defined functions should accept at least one argument which is the input matrix. 
-# The second optional argument should always be ``...`` so that parameters
-# for the clustering function can be passed by ``control`` argument from `cluster_terms`, `simplifyGO` or `simplifyEnrichment`.
-# If users forget to add ``...``, it is added internally.
-#
-# Please note, the user-defined function should automatically identify the optimized
-# number of clusters.
-#
-# The function should return a vector of cluster labels. Internally it is converted to numeric labels.
-#
-# == value
-# No value is returned.
-#
-# == example
-# register_clustering_methods(
-# 	# assume there are 5 groups
-# 	random = function(mat, ...) sample(5, nrow(mat), replace = TRUE)
-# )
-# all_clustering_methods()
-# remove_clustering_methods("random")
+#' Configure clustering methods
+#'
+#' @param ... A named list of clustering functions, see in **Details**.
+#'
+#' @details
+#' The user-defined functions should accept at least one argument which is the input matrix. 
+#' The second optional argument should always be `...` so that parameters
+#' for the clustering function can be passed by the `control` argument from [`cluster_terms()`], [`simplifyGO()`] or [`simplifyEnrichment()`].
+#' If users forget to add `...`, it is added internally.
+#'
+#' Please note, the user-defined function should automatically identify the optimized
+#' number of clusters.
+#'
+#' The function should return a vector of cluster labels. Internally it is converted to numeric labels.
+#'
+#' @rdname cluster_methods
+#' @export
+#' @examples
+#' register_clustering_methods(
+#'     # assume there are 5 groups
+#'     random = function(mat, ...) sample(5, nrow(mat), replace = TRUE)
+#' )
+#' all_clustering_methods()
+#' remove_clustering_methods("random")
 register_clustering_methods = function(...) {
 	
 	lt = list(...)
@@ -73,44 +70,32 @@ register_clustering_methods = function(...) {
 	.ENV$ALL_CLUSTERING_METHODS = names(.ENV$ALL_CLUSTERING_FUN)
 }
 
-# == title
-# All clustering methods
-#
-# == details
-# The default clustering methods are:
-#
-# -``kmeans`` see `cluster_by_kmeans`.
-# -``dynamicTreeCut`` see `cluster_by_dynamicTreeCut`.
-# -``mclust`` see `cluster_by_mclust`.
-# -``apcluster`` see `cluster_by_apcluster`.
-# -``hdbscan`` see `cluster_by_hdbscan`.
-# -``fast_greedy`` see `cluster_by_igraph`.
-# -``louvain`` see `cluster_by_igraph`.
-# -``walktrap`` see `cluster_by_igraph`.
-# -``MCL`` see `cluster_by_MCL`.
-# -``binary_cut`` see `binary_cut`.
-#
-# == value
-# A vector of method names.
-#
-# == seealso
-# New methods can be added by `register_clustering_methods`.
-#
-# == example
-# all_clustering_methods()
+#' @details
+#' The default clustering methods are:
+#'
+#' - `kmeans` see [`cluster_by_kmeans()`].
+#' - `dynamicTreeCut` see [`cluster_by_dynamicTreeCut()`].
+#' - `mclust` see [`cluster_by_mclust()`].
+#' - `apcluster` see [`cluster_by_apcluster()`].
+#' - `hdbscan` see [`cluster_by_hdbscan()`].
+#' - `fast_greedy` see [`cluster_by_fast_greedy()`].
+#' - `louvain` see [`cluster_by_louvain()`].
+#' - `walktrap` see [`cluster_by_walktrap()`].
+#' - `MCL` see [`cluster_by_MCL()`].
+#' - `binary_cut` see [`binary_cut()`].
+#'
+#' @returns
+#' `all_clustering_methods()` returns a vector of clustering method names.
+#' @export
+#' @rdname cluster_methods
 all_clustering_methods = function() {
 	x = .ENV$ALL_CLUSTERING_METHODS
 	return(x)
 }
 
-# == title
-# Remove clustering methods
-#
-# == param
-# -method A vector of method names.
-#
-# == value
-# No value is returned.
+#' @param method A vector of method names.
+#' @export
+#' @rdname cluster_methods
 remove_clustering_methods = function(method) {
 	nm_keep = setdiff(.ENV$ALL_CLUSTERING_METHODS, method)
 	.ENV$ALL_CLUSTERING_FUN = .ENV$ALL_CLUSTERING_FUN[nm_keep]
@@ -125,39 +110,20 @@ register_clustering_methods(
 	mclust = function(mat, ...) cluster_by_mclust(mat, ...),
 	apcluster = function(mat, ...) cluster_by_apcluster(mat, ...),
 	hdbscan = function(mat, ...) cluster_by_hdbscan(mat, ...),
-	fast_greedy = function(mat, ...) cluster_by_igraph(mat, method = "fast_greedy", ...),
-	louvain = function(mat, ...) cluster_by_igraph(mat, method = "louvain", ...),
-	walktrap = function(mat, ...) cluster_by_igraph(mat, method = "walktrap", ...),
+	fast_greedy = function(mat, ...) cluster_by_fast_greedy(mat, ...),
+	louvain = function(mat, ...) cluster_by_louvain(mat, ...),
+	walktrap = function(mat, ...) cluster_by_walktrap(mat, ...),
 	MCL = function(mat, ...) cluster_by_MCL(mat, ...)
 )
 
-# == title
-# Reset to default clustering methods
-#
-# == details
-# The default methods are:
-#
-# -``kmeans`` see `cluster_by_kmeans`.
-# -``pam`` see `cluster_by_pam`.
-# -``dynamicTreeCut`` see `cluster_by_dynamicTreeCut`.
-# -``mclust`` see `cluster_by_mclust`.
-# -``apcluster`` see `cluster_by_apcluster`.
-# -``hdbscan`` see `cluster_by_hdbscan`.
-# -``fast_greedy`` see `cluster_by_igraph`.
-# -``louvain`` see `cluster_by_igraph`.
-# -``walktrap`` see `cluster_by_igraph`.
-# -``MCL`` see `cluster_by_MCL`.
-# -``binary_cut`` see `binary_cut`.
-#
-# == value
-# No value is returned.
-#
-# == example
-# all_clustering_methods()
-# remove_clustering_methods(c("kmeans", "mclust"))
-# all_clustering_methods()
-# reset_clustering_methods()
-# all_clustering_methods()
+#' @rdname cluster_methods
+#' @export
+#' @examples
+#' all_clustering_methods()
+#' remove_clustering_methods(c("kmeans", "mclust"))
+#' all_clustering_methods()
+#' reset_clustering_methods()
+#' all_clustering_methods()
 reset_clustering_methods = function() {
 	remove_clustering_methods(all_clustering_methods())
 	register_clustering_methods(
@@ -167,9 +133,9 @@ reset_clustering_methods = function() {
 		mclust = function(mat, ...) cluster_by_mclust(mat, ...),
 		apcluster = function(mat, ...) cluster_by_apcluster(mat, ...),
 		hdbscan = function(mat, ...) cluster_by_hdbscan(mat, ...),
-		fast_greedy = function(mat, ...) cluster_by_igraph(mat, method = "cluster_fast_greedy", ...),
-		louvain = function(mat, ...) cluster_by_igraph(mat, method = "cluster_louvain", ...),
-		walktrap = function(mat, ...) cluster_by_igraph(mat, method = "cluster_walktrap", ...),
+		fast_greedy = function(mat, ...) cluster_by_fast_greedy(mat, ...),
+		louvain = function(mat, ...) cluster_by_louvain(mat, ...),
+		walktrap = function(mat, ...) cluster_by_walktrap(mat, ...),
 		MCL = function(mat, ...) cluster_by_MCL(mat, ...),
 		binary_cut = function(mat, ...) binary_cut(mat, ...)
 	)

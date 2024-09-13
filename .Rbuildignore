@@ -21,3 +21,8 @@ similarity_pathway.R
 pathway*
 gene_desc_black_list.txt
 refseq_gene_desc_human.rds
+vignettes/interactive.Rmd
+vignettes/main.css
+vignettes/simplifyEnrichment_intro.Rmd
+vignettes/word_cloud_anno.Rmd
+vignettes/summarize.Rmd

@@ -1,0 +1,123 @@
+---
+title: "Summarize simplifyEnrichment plots"
+author: "Zuguang Gu (z.gu@dkfz.de)"
+date: '`r Sys.Date()`'
+---
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+    error = FALSE,
+    tidy  = FALSE,
+    message = FALSE,
+    warning = FALSE,
+    fig.width = 5,
+    fig.height = 5,
+    fig.align = "center"
+)
+options("width" = 100)
+```
+
+The `lt` object contains a list of GO enrichment tables. 
+
+```{r, message = FALSE, results = "hide", echo = FALSE}
+library(cola)
+data(golub_cola) 
+res = golub_cola["ATC:skmeans"]
+
+library(hu6800.db)
+x = hu6800ENTREZID
+mapped_probes = mappedkeys(x)
+id_mapping = unlist(as.list(x[mapped_probes]))
+
+lt = functional_enrichment(res, k = 3, id_mapping = id_mapping)
+```
+
+```{r}
+names(lt)
+head(lt[[1]][, 1:7])
+```
+
+We first demonstrate the new plot on the single enrichment table. To use the **simplifyEnrichment** package,
+we extract significant GO terms, and then call `simplifyGO()`.
+
+```{r, fig.width = 7*1.2, fig.height = 4*1.2}
+library(simplifyEnrichment)
+df = lt[[1]]
+go_id = df$ID[df$p.adjust < 0.01]
+simplifyGO(go_id)
+```
+
+The plot looks good, but it still contains too many graphic contents. For example, the GO similarity heatmap
+is useful, but it takes too much space on the final plot. Here I developed a new function `summarizeGO()` which
+simplifies the enrichment results even more. The idea is that since we already have the GO clusters, with a certain
+statistic of enrichment, we can simply use its average for the GO cluster.
+
+In the following example, we use `-log10(p.adjust)` as an enrichment measure. The heights of bars correspond to
+the mean of `-log10(p.adjust)` of GO terms in different GO clusters. On the left side, we still use the word clouds which
+efficiently show the general functions in each GO cluster.
+
+```{r, fig.width = 6*1.2, fig.height = 4*1.4}
+l = df$p.adjust < 0.01
+summarizeGO(df$ID[l], -log10(df$p.adjust)[l], axis_label = "average -log10(p.adjust)")
+```
+
+GO IDs can be attached to the numeric value vector, but this time, the `value` argument
+should be explicitely specified when calling `summarizeGO()`.
+
+```{r, eval = FALSE}
+v = -log10(df$p.adjust)
+names(v) = df$ID
+summarizeGO(value = v[l], axis_label = "average -log10(p.adjust)")
+```
+
+
+Beside `-log10(p.adjust)`, we also suggest to use log2 fold enrichment as the enrichment measure. It is calculated as
+
+$$ \log_2 \left( \frac{k/m_1}{m_2/n} \right) $$
+
+where $k$ is the number of DE genes (if the genes of interest are DE genes) in
+a gene set, $m_1$ is the size of DE genes, $m_2$ is the size of the gene set,
+$n$ is the total number of genes in the universal set. Of course, the definition
+of $m_1$ and $m_2$ can be switched.
+
+```{r, fig.width = 6*1.2, fig.height = 4*1.4}
+k = as.numeric(gsub("/\\d+$", "", df$GeneRatio))
+m1 = as.numeric(gsub("^\\d+/", "", df$GeneRatio))
+m2 = as.numeric(gsub("/\\d+$", "", df$BgRatio))
+n = as.numeric(gsub("^\\d+/", "", df$BgRatio))
+log2_fold_enrichment = log2(k*n/m1/m2)
+
+summarizeGO(df$ID[l], log2_fold_enrichment[l], axis_label = "average log2(fold_enrichment)")
+```
+
+Of course, you can construct a named `log2_fold_enrichment` vector which only contains significant GO terms.
+
+```{r, eval = FALSE}
+names(log2_fold_enrichment) = df$ID
+summarizeGO(value = log2_fold_enrichment[l], axis_label = "average log2(fold_enrichment)")
+```
+
+For multiple GO enrichment results, `simplifyGOFromMultipleLists()` can be used to visualize and compare GO clusters.
+
+```{r, fig.width=10, fig.height = 6, out.width = "100%"}
+simplifyGOFromMultipleLists(lt, padj_cutoff = 0.001)
+```
+
+`summarizeGO()` can also be used to simplify such plot. Now the value of `value` is a list of numeric named vectors which contains
+significant GO terms in each enrichment table:
+
+```{r, fig.width = 6*1.2, fig.height = 4*1.8}
+value = lapply(lt, function(df) {
+    v = -log10(df$p.adjust)
+    names(v) = df$ID
+    v[df$p.adjust < 0.001]
+})
+summarizeGO(value = value, axis_label = "average -log10(p.adjust)", legend_title = "-log10(p.adjust)")
+```
+
+
+```{r}
+sessionInfo()
+```
+

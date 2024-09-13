@@ -1,24 +1,22 @@
 
-# == title
-# Difference score
-#
-# == param
-# -mat The similarity matrix.
-# -cl Cluster labels.
-#
-# == details
-# This function measures the different between the similarity values for the terms
-# that belong to the same clusters and in different clusters. The difference score
-# is the Kolmogorov-Smirnov statistic between the two distributions.
-#
-# == value
-# A numeric scalar.
-#
-# == examples
-# mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", 
-#     package = "simplifyEnrichment"))
-# cl = binary_cut(mat)
-# difference_score(mat, cl)
+#' Difference score
+#'
+#' @param mat The similarity matrix.
+#' @param cl Cluster labels.
+#'
+#' @details
+#' This function measures the different between the similarity values for the terms
+#' that belong to the same clusters and in different clusters. The difference score
+#' is the Kolmogorov-Smirnov statistic between the two distributions.
+#'
+#' @return
+#' A numeric scalar.
+#' @export
+#' @examples
+#' mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", 
+#'     package = "simplifyEnrichment"))
+#' cl = binary_cut(mat)
+#' difference_score(mat, cl)
 difference_score = function(mat, cl) {
 	n = nrow(mat)
 	l_block = matrix(FALSE, nrow = nrow(mat), ncol = ncol(mat))

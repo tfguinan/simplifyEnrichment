@@ -1,16 +1,22 @@
 
-# == title
-# Partition by kmeans
-#
-# == param
-# -mat The similarity matrix.
-# -n_repeats Number of repeated runs of k-means.
-#
-# == details
-# Since k-means clustering brings randomness, this function performs
-# k-means clustering several times (controlled by ``n_repeats``) and uses the final consensus partitioning.
-#
-# This function is used to set to the ``partition_fun`` argument in `binary_cut`.
+
+#' Partition the matrix
+#'
+#' @param mat The submatrix in the binary cut clustering process.
+#' @param n_repeats Number of repeated runs of k-means clustering.
+#'
+#' @details
+#' These functions can be set to the `partition_fun` argument in [`binary_cut()`].
+#' 
+#' `partition_by_kmeans()`: Since k-means clustering brings randomness, this function performs
+#' k-means clustering several times (controlled by `n_repeats`) and uses the final consensus partitioning results.
+#' 
+#' @export
+#' @import clue
+#' @rdname node_partition
+#' @return
+#' All partitioning functions split the matrix into two groups and return a categorical vector of
+#' labels of 1 and 2.
 partition_by_kmeans = function(mat, n_repeats = 10) {
     partition_list = lapply(seq_len(n_repeats), function(i) {
         as.cl_hard_partition(kmeans(mat, 2))
@@ -24,16 +30,12 @@ partition_by_kmeans = function(mat, n_repeats = 10) {
     cl
 }
 
-# == title
-# Partition by PAM
-#
-# == param
-# -mat The similarity matrix.
-#
-# == details
-# The clustering is performed by `cluster::pam` with setting ``pamonce`` argument to 5.
-#
-# This function is used to set to the ``partition_fun`` argument in `binary_cut`.
+#' @details
+#' `partition_by_pam()`: The clustering is performed by [`cluster::pam()`] with the `pamonce` argument set to 5.
+#' 
+#' @export
+#' @importFrom cluster pam
+#' @rdname node_partition
 partition_by_pam = function(mat) {
     if(nrow(mat) > 10) {
         fit = pam(mat, 2, pamonce = 5)
@@ -45,33 +47,20 @@ partition_by_pam = function(mat) {
 }
 
 
-# == title
-# Partition by hclust
-#
-# == param
-# -mat The similarity matrix.
-#
-# == details
-# The "ward.D2" clusering method was used.
-#
-# This function is used to set to the ``partition_fun`` argument in `binary_cut`.
+#' @details
+#' `partition_by_hclust()`: The "ward.D2" clusering method was used.
+#'
+#' @export
+#' @rdname node_partition
 partition_by_hclust = function(mat) {
-    cutree(stats::hclust(stats::dist(mat), method = "ward.D2"), 2)
+    cutree(hclust(dist(mat), method = "ward.D2"), 2)
 }
 
-# partition_by_skmeans = function(mat) {
-#     skmeans::skmeans(x = mat, k = 2)$cluster
-# }
-
-
-# == title
-# Partition by kmeans++
-#
-# == param
-# -mat The similarity matrix.
-#
-# == details
-# This function is used to set to the ``partition_fun`` argument in `binary_cut`.
+#' @details
+#' `partition_by_kmeanspp()`: It uses the kmeanspp method from the **flexclust** package.
+#' 
+#' @export
+#' @rdname node_partition
 partition_by_kmeanspp = function(mat) {
     check_pkg("flexclust", bioc = FALSE)
     

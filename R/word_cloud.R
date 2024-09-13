@@ -1,31 +1,29 @@
 
-# == title
-# Calculate word frequency
-#
-# == param
-# -term A vector of description texts.
-# -exclude_words The words that should be excluded.
-# -stop_words The stop words that should be be removed.
-# -min_word_length Minimum length of the word to be counted.
-# -tokenizer The tokenizer function, one of the values accepted by ``tm::termFreq``.
-# -transform_case The function normalizing lettercase of the words.
-# -remove_numbers Whether to remove numbers.
-# -remove_punctuation Whether to remove punctuation.
-# -custom_transformer Custom function that transforms words.
-# -stemming Whether to only keep the roots of inflected words.
-# -dictionary A vector of words to be counted (if given all other words will be excluded).
-#
-# == details
-# The text preprocessing followings the instructions from http://www.sthda.com/english/wiki/word-cloud-generator-in-r-one-killer-function-to-do-everything-you-need .
-#
-# == value
-# A data frame with words and frequencies.
-#
-# == example
-# gm = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", package = "simplifyEnrichment"))
-# go_id = rownames(gm)
-# go_term = AnnotationDbi::select(GO.db::GO.db, keys = go_id, columns = "TERM")$TERM
-# count_words(go_term)
+#' Calculate word frequency
+#'
+#' @param term A vector of description texts.
+#' @param exclude_words The words that should be excluded.
+#' @param stop_words The stop words that should be be removed.
+#' @param min_word_length Minimum length of the word to be counted.
+#' @param tokenizer The tokenizer function, one of the values accepted by ``tm::termFreq``.
+#' @param transform_case The function normalizing lettercase of the words.
+#' @param remove_numbers Whether to remove numbers.
+#' @param remove_punctuation Whether to remove punctuation.
+#' @param custom_transformer Custom function that transforms words.
+#' @param stemming Whether to only keep the roots of inflected words.
+#' @param dictionary A vector of words to be counted (if given all other words will be excluded).
+#'
+#' @details
+#' The text preprocessing followings the instruction from \url{http://www.sthda.com/english/wiki/word-cloud-generator-in-r-one-killer-function-to-do-everything-you-need}.
+#'
+#' @return
+#' A data frame with words and frequencies.
+#' @export
+#' @examples
+#' gm = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", package = "simplifyEnrichment"))
+#' go_id = rownames(gm)
+#' go_term = AnnotationDbi::select(GO.db::GO.db, keys = go_id, columns = "TERM")$TERM
+#' count_words(go_term) |> head()
 count_words = function(term,
 	exclude_words = NULL, stop_words = stopwords(),
 	min_word_length = 1, tokenizer = 'words', transform_case = tolower,
@@ -77,53 +75,51 @@ count_words = function(term,
 }
 
 
-# == title
-# A simple grob for the word cloud
-#
-# == param
-# -text A vector of words.
-# -fontsize The corresponding font size. With the frequency of the words known, `scale_fontsize` can be used to linearly interpolate frequencies to font sizes.
-# -line_space Space between lines. The value can be a `grid::unit` object or a numeric scalar which is measured in mm.
-# -word_space Space between words. The value can be a `grid::unit` object or a numeric scalar which is measured in mm.
-# -max_width The maximal width of the viewport to put the word cloud. The value can be a `grid::unit` object or a numeric scalar which is measured in mm.
-#        Note this might be larger than the final width of the returned grob object.
-# -col Colors for the words. The value can be a vector, in numeric or character, which should have the same
-#      length as ``text``. Or it is a self-defined function that takes the font size vector as 
-#      the only argument. The function should return a color vector. See Examples.
-# -add_new_line Whether to add new line after every word? If ``TRUE``, each word will be in a separated line.
-# -test Internally used. It basically adds borders to the words and the viewport.
-#
-# == value
-# A `grid::grob` object. The width and height of the grob can be get by `grid::grobWidth` and `grid::grobHeight`.
-#
-# == example
-# # very old R versions do not have strrep() function
-# if(!exists("strrep")) {
-#     strrep = function(x, i) paste(rep(x, i), collapse = "")
-# }
-# words = sapply(1:30, function(x) strrep(sample(letters, 1), sample(3:10, 1)))
-# require(grid)
-# gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
-#     max_width = 100)
-# grid.newpage(); grid.draw(gb)
-#
-# # color as a single scalar
-# gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
-#     max_width = 100, col = 1)
-# grid.newpage(); grid.draw(gb)
-#
-# # color as a vector
-# gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
-#     max_width = 100, col = 1:30)
-# grid.newpage(); grid.draw(gb)
-#
-# # color as a function
-# require(circlize)
-# col_fun = colorRamp2(c(5, 17, 30), c("blue", "black", "red"))
-# gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
-#     max_width = 100, col = function(fs) col_fun(fs))
-# grid.newpage(); grid.draw(gb)
-#
+#' A simple grob for the word cloud
+#'
+#' @param text A vector of words.
+#' @param fontsize The corresponding font size. With the frequency of the words known, `scale_fontsize` can be used to linearly interpolate frequencies to font sizes.
+#' @param line_space Space between lines. The value can be a `grid::unit` object or a numeric scalar which is measured in mm.
+#' @param word_space Space between words. The value can be a `grid::unit` object or a numeric scalar which is measured in mm.
+#' @param max_width The maximal width of the viewport to put the word cloud. The value can be a `grid::unit` object or a numeric scalar which is measured in mm.
+#'        Note this might be larger than the final width of the returned grob object.
+#' @param col Colors for the words. The value can be a vector, in numeric or character, which should have the same
+#'      length as ``text``. Or it is a self-defined function that takes the font size vector as 
+#'      the only argument. The function should return a color vector. See Examples.
+#' @param add_new_line Whether to add new line after every word? If ``TRUE``, each word will be in a separated line.
+#' @param test Internally used. It basically adds borders to the words and the viewport.
+#'
+#' @return
+#' A `grid::grob` object. The width and height of the grob can be get by `grid::grobWidth` and `grid::grobHeight`.
+#' @export
+#' @examples
+#' # very old R versions do not have strrep() function
+#' if(!exists("strrep")) {
+#'     strrep = function(x, i) paste(rep(x, i), collapse = "")
+#' }
+#' words = sapply(1:30, function(x) strrep(sample(letters, 1), sample(3:10, 1)))
+#' require(grid)
+#' gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
+#'     max_width = 100)
+#' grid.newpage(); grid.draw(gb)
+#'
+#' # color as a single scalar
+#' gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
+#'     max_width = 100, col = 1)
+#' grid.newpage(); grid.draw(gb)
+#'
+#' # color as a vector
+#' gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
+#'     max_width = 100, col = 1:30)
+#' grid.newpage(); grid.draw(gb)
+#'
+#' # color as a function
+#' require(circlize)
+#' col_fun = colorRamp2(c(5, 17, 30), c("blue", "black", "red"))
+#' gb = word_cloud_grob(words, fontsize = runif(30, min = 5, max = 30), 
+#'     max_width = 100, col = function(fs) col_fun(fs))
+#' grid.newpage(); grid.draw(gb)
+#'
 word_cloud_grob = function(text, fontsize, 
 	line_space = unit(4, "pt"), word_space = unit(4, "pt"), max_width = unit(80, "mm"), 
 	col = function(fs) circlize::rand_color(length(fs), luminosity = "dark"),
@@ -215,84 +211,75 @@ word_cloud_grob = function(text, fontsize,
 	return(gb)
 }
 
-# == title
-# Width for word_cloud grob
-#
-# == param
-# -x The ``word_cloud`` grob returned by `word_cloud_grob`.
-#
-# == value
-# A `grid::unit` object.
+#' @rdname word_cloud_grob
+#'
+#' @param x The ``word_cloud`` grob returned by `word_cloud_grob`.
+#' @export
 widthDetails.word_cloud = function(x) {
 	x$vp$width
 }
 
-# == title
-# Height for word_cloud grob
-#
-# == param
-# -x The ``word_cloud`` grob returned by `word_cloud_grob`.
-#
-# == value
-# A `grid::unit` object.
+#' @rdname word_cloud_grob
+#'
+#' @export
 heightDetails.word_cloud = function(x) {
 	x$vp$height
 }
 
 
-# == title
-# Word cloud annotations
-#
-# == param
-# -align_to How to align the annotations to the heatmap. Similar as in `ComplexHeatmap::anno_link`, the value of ``align_to``
-#           can be a list of row indices or a categorical vector where each vector in the list corresponds to a word cloud. 
-#           If it is a categorical vector, rows with the same level correspond to a same word cloud. 
-#           If ``align_to`` is a categorical vector and ``term`` is a list, names of ``term`` should have overlap to the levels in ``align_to``.
-#           When ``align_to`` is set as a categorical vector, normally the same value is set to ``row_split`` in the main heatmap so that each row slice
-#           can correspond to a word cloud.
-# -term The description text used for constructing the word clouds. The value should have the same format as ``align_to``. If ``align_to``
-#          is a list, ``term`` should also be a list. In this case, the length of vectors in ``term`` is not necessarily the same
-#          as in ``align_to``. E.g. ``length(term[[1]])`` is not necessarily equal to ``length(align_to[[1]]``. If ``align_to``
-#          is a categorical vector, ``term`` should also be a character vector with the same length as ``align_to``.
-#          To make it more genrall, when ``align_to`` is a list, ``term`` can also be a list of data frames where the first column contains 
-#          keywords and the second column contains numeric values that will be mapped to font sizes in the word clouds.
-# -exclude_words The words excluced for construcing word cloud.
-# -max_words Maximal number of words visualized in the word cloud.
-# -word_cloud_grob_param A list of graphics parameters passed to `word_cloud_grob`.
-# -fontsize_range The range of the font size. The value should be a numeric vector with length two.
-#       The font size interpolation is linear.
-# -value_range The range of values to map to font sizes.
-# -bg_gp Graphics parameters for controlling the background.
-# -side Side of the annotation relative to the heatmap.
-# -add_new_line Whether to add new line after every word? If ``TRUE``, each word will be in a separated line.
-# -count_words_param A list of parameters passed to `count_words`.
-# -... Other parameters.
-# -return_gbl Internally used.
-#
-# == details
-# The word cloud annotation is constructed by `ComplexHeatmap::anno_link`.
-#
-# If the annotation is failed to construct or no keyword is found, the function returns a `ComplexHeatmap::anno_empty` with 1px width.
-#
-# English stop words, punctuation and numbers are removed by default when counting words. As specific stop words might
-# coincide with gene or pathway names, and numbers in genes names might be meaningful it is recommended to adjust this
-# behaviour by passing appropriate arguments to the `count_words` function using ``count_words_param``.
-#
-# == example
-# gm = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", package = "simplifyEnrichment"))
-# go_id = rownames(gm)
-# go_term = AnnotationDbi::select(GO.db::GO.db, keys = go_id, columns = "TERM")$TERM
-#
-# split = sample(letters[1:4], 100, replace = TRUE)
-# align_to = split(1:100, split)
-# term = lapply(letters[1:4], function(x) sample(go_term, sample(100:400, 1)))
-# names(term) = letters[1:4]
-#
-# require(ComplexHeatmap)
-# mat = matrix(rnorm(100*10), nrow = 100)
-# Heatmap(mat, cluster_rows = FALSE, row_split = split, 
-# 	right_annotation = rowAnnotation(foo = anno_word_cloud(align_to, term)))
-#
+#' Word cloud annotations
+#'
+#' @param align_to How to align the annotations to the heatmap. Similar as in `ComplexHeatmap::anno_link`, the value of ``align_to``
+#'           can be a list of row indices or a categorical vector where each vector in the list corresponds to a word cloud. 
+#'           If it is a categorical vector, rows with the same level correspond to a same word cloud. 
+#'           If ``align_to`` is a categorical vector and ``term`` is a list, names of ``term`` should have overlap to the levels in ``align_to``.
+#'           When ``align_to`` is set as a categorical vector, normally the same value is set to ``row_split`` in the main heatmap so that each row slice
+#'           can correspond to a word cloud.
+#' @param term The description text used for constructing the word clouds. The value should have the same format as ``align_to``. If ``align_to``
+#'          is a list, ``term`` should also be a list. In this case, the length of vectors in ``term`` is not necessarily the same
+#'          as in ``align_to``. E.g. ``length(term[[1]])`` is not necessarily equal to ``length(align_to[[1]]``. If ``align_to``
+#'          is a categorical vector, ``term`` should also be a character vector with the same length as ``align_to``.
+#'          To make it more genrall, when ``align_to`` is a list, ``term`` can also be a list of data frames where the first column contains 
+#'          keywords and the second column contains numeric values that will be mapped to font sizes in the word clouds.
+#' @param exclude_words The words excluced for construcing word cloud.
+#' @param max_words Maximal number of words visualized in the word cloud.
+#' @param word_cloud_grob_param A list of graphics parameters passed to `word_cloud_grob`.
+#' @param fontsize_range The range of the font size. The value should be a numeric vector with length two.
+#'       The font size interpolation is linear.
+#' @param value_range The range of values to map to font sizes.
+#' @param bg_gp Graphics parameters for controlling the background.
+#' @param side Side of the annotation relative to the heatmap.
+#' @param add_new_line Whether to add new line after every word? If ``TRUE``, each word will be in a separated line.
+#' @param count_words_param A list of parameters passed to `count_words`.
+#' @param ... Other parameters.
+#' @param return_gbl Internally used.
+#'
+#' @details
+#' The word cloud annotation is constructed by `ComplexHeatmap::anno_link`.
+#'
+#' If the annotation is failed to construct or no keyword is found, the function returns a `ComplexHeatmap::anno_empty` with 1px width.
+#'
+#' English stop words, punctuation and numbers are removed by default when counting words. As specific stop words might
+#' coincide with gene or pathway names, and numbers in genes names might be meaningful it is recommended to adjust this
+#' behaviour by passing appropriate arguments to the `count_words` function using ``count_words_param``.
+#' @export
+#' @import colorspace
+#' @import methods
+#' @examples
+#' gm = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", package = "simplifyEnrichment"))
+#' go_id = rownames(gm)
+#' go_term = AnnotationDbi::select(GO.db::GO.db, keys = go_id, columns = "TERM")$TERM
+#'
+#' split = sample(letters[1:4], 100, replace = TRUE)
+#' align_to = split(1:100, split)
+#' term = lapply(letters[1:4], function(x) sample(go_term, sample(100:400, 1)))
+#' names(term) = letters[1:4]
+#'
+#' require(ComplexHeatmap)
+#' mat = matrix(rnorm(100*10), nrow = 100)
+#' Heatmap(mat, cluster_rows = FALSE, row_split = split, 
+#' 	right_annotation = rowAnnotation(foo = anno_word_cloud(align_to, term)))
+#'
 anno_word_cloud = function(align_to, term, exclude_words = NULL, max_words = 10,
 	word_cloud_grob_param = list(), fontsize_range = c(4, 16), value_range = NULL,
 	bg_gp = gpar(fill = "#DDDDDD", col = "#AAAAAA"), side = c("right", "left"),
@@ -464,21 +451,21 @@ anno_word_cloud = function(align_to, term, exclude_words = NULL, max_words = 10,
 	anno
 }
 
-# == title
-# Word cloud annotations from GO
-#
-# == param
-# -align_to The same format as in `anno_word_cloud`.
-# -go_id The value should be in the same format as ``align_to``. If ``go_id`` is a vector, it should have the
-#       same length as ``align_to``, and if ``go_id`` is a list, note, e.g. ``length(go_id[[1]])`` is not necessarily equal to ``length(align_to[[1]]``.
-#       If ``align_to`` is a categorical vector and ``go_id`` is a list, names of ``go_id`` should have overlap to the levels in ``align_to``.
-# -min_stat Minimal value for ``stat`` for selecting keywords.
-# -stat What type of value to map to font sizes of the keywords. There are two possible values. "pvalue": enrichment is applied to keywords and -log10(p-value)
-#       is used to map to font size; "count": simply word frequency of keywords.
-# -term Alternatively the GO description can be set via the ``term`` argument. The same format as in `anno_word_cloud`.
-# -exclude_words The words excluced for construcing word cloud. Some words are internally exclucded: ``c("via", "protein", "factor", "side", "type", "specific")``.
-# -... All other arguments passed to `anno_word_cloud`.
-#
+#' Word cloud annotations from GO
+#'
+#' @param align_to The same format as in `anno_word_cloud`.
+#' @param go_id The value should be in the same format as ``align_to``. If ``go_id`` is a vector, it should have the
+#'       same length as ``align_to``, and if ``go_id`` is a list, note, e.g. ``length(go_id[[1]])`` is not necessarily equal to ``length(align_to[[1]]``.
+#'       If ``align_to`` is a categorical vector and ``go_id`` is a list, names of ``go_id`` should have overlap to the levels in ``align_to``.
+#' @param min_stat Minimal value for ``stat`` for selecting keywords.
+#' @param stat What type of value to map to font sizes of the keywords. There are two possible values. "pvalue": enrichment is applied to keywords and -log10(p-value)
+#'       is used to map to font size; "count": simply word frequency of keywords.
+#' @param term Alternatively the GO description can be set via the ``term`` argument. The same format as in `anno_word_cloud`.
+#' @param exclude_words The words excluced for construcing word cloud. Some words are internally exclucded: ``c("via", "protein", "factor", "side", "type", "specific")``.
+#' @param ... All other arguments passed to `anno_word_cloud`.
+#' 
+#' @export
+#' @import slam
 anno_word_cloud_from_GO = function(align_to, go_id, stat = c("pvalue", "count"), 
 	min_stat = ifelse(stat == "count", 5, 0.05),
 	term = NULL, exclude_words = NULL, ...) {

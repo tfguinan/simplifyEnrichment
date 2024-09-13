@@ -44,6 +44,7 @@ message_wrap = function (...)  {
 }
 
 
+#' @importFrom utils flush.console install.packages packageDescription
 check_pkg = function(pkg, bioc = FALSE) {
     if(requireNamespace(pkg, quietly = TRUE)) {
         return(NULL)

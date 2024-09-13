@@ -1,9 +1,11 @@
 
 
-GO_EXCLUDE_WORDS = c("via", "protein", "factor", "side", "type", "specific")
+GO_EXCLUDE_WORDS = c("via", "protein", "factor", "side", "type", "specific", "regulation", "process")
 
 
 # -term a vector of texts
+
+#' @import tm
 make_term_document_matrix = function(term,
 	exclude_words = NULL, stop_words = stopwords(),
 	min_word_length = 2, tokenizer = 'words', transform_case = tolower,
@@ -114,31 +116,31 @@ keyword_enrichment = function(term_id, tdm, min_bg = 5, min_term = 2) {
 }
 
 
-# == title
-# Keyword enrichment for GO terms
-#
-# == param
-# -go_id A vector of GO IDs.
-# -min_bg Minimal number of GO terms (in the background, i.e. all GO temrs in the GO database) that contain a specific keyword.
-# -min_term Minimal number of GO terms (GO terms in ``go_id``) that contain a specific keyword.
-#
-# == details
-# The enrichment is applied by Fisher's exact test. For a keyword, there is the following 2x2 contigency table:
-#
-#                       | contains the keyword | does not contain the keyword
-#     In the GO set     |          s11         |          s12
-#     Not in the GO set |          s21         |          s22
-#
-# where s11, s12, s21 and s22 are number of GO terms in each category.
-#
-# == value
-# A data frame with keyword enrichment results.
-#
-# == example
-# \dontrun{
-# go_id = random_GO(100)
-# keyword_enrichment_from_GO(go_id)
-# }
+#' Keyword enrichment for GO terms
+#'
+#' @param go_id A vector of GO IDs.
+#' @param min_bg Minimal number of GO terms (in the background, i.e. all GO temrs in the GO database) that contain a specific keyword.
+#' @param min_term Minimal number of GO terms (GO terms in ``go_id``) that contain a specific keyword.
+#'
+#' @details
+#' The enrichment is applied by Fisher's exact test. For a keyword, there is the following 2x2 contigency table:
+#'
+#' ```
+#'                       | contains the keyword | does not contain the keyword
+#'     In the GO set     |          s11         |          s12
+#'     Not in the GO set |          s21         |          s22
+#' ```
+#' 
+#' where `s11`, `s12`, `s21` and `s22` are the counts of GO terms in the four categories.
+#'
+#' @return
+#' A data frame with keyword enrichment results.
+#' @export
+#' @examples
+#' \donttest{
+#' go_id = random_GO(100)
+#' keyword_enrichment_from_GO(go_id)
+#' }
 keyword_enrichment_from_GO = function(go_id, min_bg = 5, min_term = 2) {
 
 	if(is.null(env$tdm_GO)) {

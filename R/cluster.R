@@ -1,43 +1,38 @@
 
-# == title
-# Cluster functional terms
-#
-# == param
-# -mat A similarity matrix.
-# -method Method for clustering the matrix.
-# -control A list of parameters passed to the corresponding clustering function.
-# -catch_error Internally used.
-# -verbose Whether to print messages.
-#
-# == details
-# The following methods are the default:
-#
-# -``kmeans`` see `cluster_by_kmeans`.
-# -``pam`` see `cluster_by_pam`.
-# -``dynamicTreeCut`` see `cluster_by_dynamicTreeCut`.
-# -``mclust`` see `cluster_by_mclust`.
-# -``apcluster`` see `cluster_by_apcluster`.
-# -``hdbscan`` see `cluster_by_hdbscan`.
-# -``leading_eigen`` see `cluster_by_igraph`.
-# -``louvain`` see `cluster_by_igraph`.
-# -``walktrap`` see `cluster_by_igraph`.
-# -``MCL`` see `cluster_by_MCL`.
-# -``binary_cut`` see `binary_cut`.
-#
-# Also the user-defined methods in `all_clustering_methods` can be used here.
-#
-# New clustering methods can be registered by `register_clustering_methods`.
-#
-# Please note it is better to directly call `cluster_terms` for clustering while not the individual ``cluster_by_*`` functions
-# because `cluster_terms` does additional cluster label adjustment.
-#
-# == value
-# A numeric vector of cluster labels (in numeric).
-#
-# If ``catch_error`` is set to ``TRUE`` and if the clustering produces an error,
-# the function returns a ``try-error`` object.
-cluster_terms = function(mat, method = "binary_cut", control = list(), catch_error = FALSE, 
-	verbose = TRUE) {
+#' Cluster terms based on their similarity matrix
+#'
+#' @param mat A similarity matrix.
+#' @param method The clustering methods. Value should be in [`all_clustering_methods()`].
+#' @param control A list of parameters passed to the corresponding clustering function.
+#' @param verbose Whether to print messages.
+#'
+#' @details
+#' New clustering methods can be registered by [`register_clustering_methods()`].
+#'
+#' Please note it is better to directly use `cluster_terms()` for clustering while not the individual ``cluster_by_*`` functions
+#' because `cluster_terms()` does additional cluster label adjustment.
+#' 
+#' By default, there are the following clustering methods and corresponding clustering functions:
+#' 
+#' - `kmeans` see [`cluster_by_kmeans()`].
+#' - `dynamicTreeCut` see [`cluster_by_dynamicTreeCut()`].
+#' - `mclust` see [`cluster_by_mclust()`].
+#' - `apcluster` see [`cluster_by_apcluster()`].
+#' - `hdbscan` see [`cluster_by_hdbscan()`].
+#' - `fast_greedy` see [`cluster_by_fast_greedy()`].
+#' - `louvain` see [`cluster_by_louvain()`].
+#' - `walktrap` see [`cluster_by_walktrap()`].
+#' - `MCL` see [`cluster_by_MCL()`].
+#' - `binary_cut` see [`binary_cut()`].
+#' 
+#' The additional argument in individual clustering functions can be set with the `control` argument
+#' in `cluster_terms()`.
+#'
+#' @returns
+#' A vector of numeric cluster labels.
+#' @export
+#' @rdname cluster_terms
+cluster_terms = function(mat, method = "binary_cut", control = list(), verbose = se_opt$verbose) {
 	
 	if(nrow(mat) != ncol(mat)) {
 		stop_wrap("The matrix should be square.")
@@ -49,17 +44,8 @@ cluster_terms = function(mat, method = "binary_cut", control = list(), catch_err
 	fun = get_clustering_method(method, control = control)
 	
 	t1 = Sys.time()
-	oe = try(cl <- fun(mat), silent = TRUE)
+	cl = fun(mat)
 	t2 = Sys.time()
-
-	if(inherits(oe, "try-error")) {
-		if(catch_error) {
-			return(oe)
-		} else {
-			message("")
-			stop(oe)
-		}
-	}
 
 	t_diff = t2 - t1
 	t_diff = format(t_diff)
@@ -88,21 +74,16 @@ cluster_terms = function(mat, method = "binary_cut", control = list(), catch_err
 }
 
 
-# == title
-# Cluster similarity matrix by k-means clustering
-#
-# == param
-# -mat The similarity matrix.
-# -max_k maximal k for k-means clustering.
-# -... Other arguments passed to `stats::kmeans`.
-#
-# == details
-# The best number of k for k-means clustering is identified according to the "elbow" or "knee" method on
-# the distribution of within-cluster sum of squares (WSS) at each k.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
+#' @param max_k Maximal _k_ for k-means/PAM clustering. K-means/PAM clustering is applied from k = 2 to k = max_k.
+#' @param ... Other arguments.
+#'
+#' @details
+#' `cluster_by_kmeans()`: The best k for k-means clustering is determined according to the "elbow" or "knee" method on
+#' the distribution of within-cluster sum of squares (WSS) on each k. All other arguments are passed
+#' from `...` to [`stats::kmeans()`].
+#'
+#' @export
+#' @rdname cluster_terms
 cluster_by_kmeans = function(mat, max_k = max(2, min(round(nrow(mat)/5), 100)), ...) {
 	
 	cl = list()
@@ -123,20 +104,12 @@ cluster_by_kmeans = function(mat, max_k = max(2, min(round(nrow(mat)/5), 100)), 
 }
 
 
-# == title
-# Cluster similarity matrix by pam clustering
-#
-# == param
-# -mat The similarity matrix.
-# -max_k maximal k for pam clustering.
-# -... Other arguments passed to `fpc::pamk`.
-#
-# == details
-# PAM is applied by `fpc::pamk` which can automatically select the best k.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
+#' @details
+#' `cluster_by_pam()`: PAM is applied by [`fpc::pamk()`] which can automatically select the best k.
+#' All other arguments are passed from `...` to [`fpc::pamk()`].
+#'
+#' @export
+#' @rdname cluster_terms
 cluster_by_pam = function(mat, max_k = max(2, min(round(nrow(mat)/10), 100)), ...) {
 
 	check_pkg("fpc", bioc = FALSE)
@@ -147,27 +120,27 @@ cluster_by_pam = function(mat, max_k = max(2, min(round(nrow(mat)/10), 100)), ..
 
 # https://stackoverflow.com/questions/2018178/finding-the-best-trade-off-point-on-a-curve
 elbow_finder = function(x_values, y_values) {
-  # Max values to create line
-  max_x_x = max(x_values)
-  max_x_y = y_values[which.max(x_values)]
-  max_y_y = max(y_values)
-  max_y_x = x_values[which.max(y_values)]
-  max_df = data.frame(x = c(max_y_x, max_x_x), y = c(max_y_y, max_x_y))
+	# Max values to create line
+	max_x_x = max(x_values)
+	max_x_y = y_values[which.max(x_values)]
+	max_y_y = max(y_values)
+	max_y_x = x_values[which.max(y_values)]
+	max_df = data.frame(x = c(max_y_x, max_x_x), y = c(max_y_y, max_x_y))
 
-  # Creating straight line between the max values
-  fit = lm(max_df$y ~ max_df$x)
+	# Creating straight line between the max values
+	fit = lm(max_df$y ~ max_df$x)
 
-  # Distance from point to line
-  distances = c()
-  for(i in seq_along(x_values)) {
-    distances = c(distances, abs(coef(fit)[2]*x_values[i] - y_values[i] + coef(fit)[1]) / sqrt(coef(fit)[2]^2 + 1^2))
-  }
+	# Distance from point to line
+	distances = c()
+	for(i in seq_along(x_values)) {
+		distances = c(distances, abs(coef(fit)[2]*x_values[i] - y_values[i] + coef(fit)[1]) / sqrt(coef(fit)[2]^2 + 1^2))
+	}
 
-  # Max distance point
-  x_max_dist = x_values[which.max(distances)]
-  y_max_dist = y_values[which.max(distances)]
+	# Max distance point
+	x_max_dist = x_values[which.max(distances)]
+	y_max_dist = y_values[which.max(distances)]
 
-  return(c(x_max_dist, y_max_dist))
+	return(c(x_max_dist, y_max_dist))
 }
 
 # https://raghavan.usc.edu//papers/kneedle-simplex11.pdf
@@ -179,17 +152,13 @@ knee_finder = function(x, y) {
 	x[which.max(d)]
 }
 
-# == title
-# Cluster similarity matrix by dynamicTreeCut
-#
-# == param
-# -mat The similarity matrix.
-# -minClusterSize Minimal number of objects in a cluster. Pass to `dynamicTreeCut::cutreeDynamic`.
-# -... Other arguments passed to `dynamicTreeCut::cutreeDynamic`.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
+#' @param minClusterSize Minimal number of objects in a cluster. Pass to [`dynamicTreeCut::cutreeDynamic()`].
+#' 
+#' @details
+#' `cluster_by_dynamicTreeCut()`: All other arguments are passed from `...` to [`dynamicTreeCut::cutreeDynamic()`].
+#' 
+#' @export
+#' @rdname cluster_terms
 cluster_by_dynamicTreeCut = function(mat, minClusterSize = 5, ...) {
 
 	check_pkg("dynamicTreeCut", bioc = FALSE)
@@ -198,59 +167,65 @@ cluster_by_dynamicTreeCut = function(mat, minClusterSize = 5, ...) {
 	unname(cl)
 }
 
-# == title
-# Cluster similarity matrix by graph community detection methods
-#
-# == param
-# -mat The similarity matrix.
-# -method The community detection method.
-# -... Other arguments passed to the corresponding community detection function, see Details.
-#
-# == details
-# The symmetric similarity matrix can be treated as an adjacency matrix and constructed as a graph/network with the similarity values as the weight of hte edges.
-# Thus, clustering the similarity matrix can be treated as detecting clusters/modules/communities from the graph.
-#
-# Four methods implemented in igraph package can be used here:
-#
-# -``fast_greedy`` uses `igraph::cluster_fast_greedy`.
-# -``leading_eigen`` uses `igraph::cluster_leading_eigen`.
-# -``louvain`` uses `igraph::cluster_louvain`.
-# -``walktrap`` uses `igraph::cluster_walktrap`.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
-cluster_by_igraph = function(mat, 
-    method = c("fast_greedy",
-               "leading_eigen",
-               "louvain",
-               "walktrap"),
-    ...) {
 
+#' @details
+#' `cluster_by_fast_greedy()`: All other arguments are passed from `...` to [`igraph::cluster_fast_greedy()`].
+#' 
+#' @export
+#' @rdname cluster_terms
+cluster_by_fast_greedy = function(mat, ...) {
 	check_pkg("igraph", bioc = FALSE)
 
-	if(is.character(method)) {
-		method = match.arg(method)[1]
-		method = paste0("cluster_", method)
-		method = getFromNamespace(method, ns = "igraph")
-	}
 	g = igraph::graph_from_adjacency_matrix(mat, mode = "upper", weighted = TRUE)
-
-	imc = method(g, ...)
+	imc = igraph::cluster_fast_greedy(g, ...)
 	as.vector(igraph::membership(imc))
 }
 
-# == title
-# Cluster similarity matrix by mclust
-#
-# == param
-# -mat The similarity matrix.
-# -G Passed to the ``G`` argument in `mclust::Mclust`.
-# -... Other arguments passed to `mclust::Mclust`.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
+#' @details
+#' `cluster_by_leading_eigen()`: All other arguments are passed from `...` to [`igraph::cluster_leading_eigen()`].
+#' 
+#' @export
+#' @rdname cluster_terms
+cluster_by_leading_eigen = function(mat, ...) {
+	check_pkg("igraph", bioc = FALSE)
+
+	g = igraph::graph_from_adjacency_matrix(mat, mode = "upper", weighted = TRUE)
+	imc = igraph::cluster_leading_eigen(g, ...)
+	as.vector(igraph::membership(imc))
+}
+
+#' @details
+#' `cluster_by_louvain()`: All other arguments are passed from `...` to [`igraph::cluster_louvain()`].
+#' 
+#' @export
+#' @rdname cluster_terms
+cluster_by_louvain = function(mat, ...) {
+	check_pkg("igraph", bioc = FALSE)
+
+	g = igraph::graph_from_adjacency_matrix(mat, mode = "upper", weighted = TRUE)
+	imc = igraph::cluster_louvain(g, ...)
+	as.vector(igraph::membership(imc))
+}
+
+#' @details
+#' `cluster_by_walktrap()`: All other arguments are passed from `...` to [`igraph::cluster_walktrap()`].
+#' 
+#' @export
+#' @rdname cluster_terms
+cluster_by_walktrap = function(mat, ...) {
+	check_pkg("igraph", bioc = FALSE)
+
+	g = igraph::graph_from_adjacency_matrix(mat, mode = "upper", weighted = TRUE)
+	imc = igraph::cluster_walktrap(g, ...)
+	as.vector(igraph::membership(imc))
+}
+
+#' @param G Passed to the `G` argument in [`mclust::Mclust()`] which is the number of clusters.
+#' @details
+#' `cluster_by_mclust()`: All other arguments are passed from `...` to [`mclust::Mclust()`].
+#' 
+#' @export
+#' @rdname cluster_terms
 cluster_by_mclust = function(mat, G = seq_len(max(2, min(round(nrow(mat)/5), 100))), ...) {
 	
 	check_pkg("mclust", bioc = FALSE)
@@ -262,17 +237,12 @@ cluster_by_mclust = function(mat, G = seq_len(max(2, min(round(nrow(mat)/5), 100
 	unname(fit$classification)
 }
 
-# == title
-# Cluster similarity matrix by apcluster
-#
-# == param
-# -mat The similarity matrix.
-# -s Passed to the ``s`` argument in `apcluster::apcluster`.
-# -... Other arguments passed to `apcluster::apcluster`.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
+#' @param s Passed to the `s` argument in [`apcluster::apcluster()`].
+#' @details
+#' `cluster_by_apcluster()`: All other arguments are passed from `...` to [`apcluster::apcluster()`].
+#' 
+#' @export
+#' @rdname cluster_terms
 cluster_by_apcluster = function(mat, s = apcluster::negDistMat(r = 2), ...) {
 	
 	check_pkg("apcluster", bioc = FALSE)
@@ -286,17 +256,12 @@ cluster_by_apcluster = function(mat, s = apcluster::negDistMat(r = 2), ...) {
 }
 
 
-# == title
-# Cluster similarity matrix by hdbscan
-#
-# == param
-# -mat The similarity matrix.
-# -minPts Passed to the ``minPts`` argument in `dbscan::hdbscan`.
-# -... Other arguments passed to `dbscan::hdbscan`.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
+#' @param minPts Passed to the `minPts` argument in [`dbscan::hdbscan()`].
+#' @details
+#' `cluster_by_hdbscan()`: All other arguments are passed from `...` to [`dbscan::hdbscan()`].
+#' 
+#' @export
+#' @rdname cluster_terms
 cluster_by_hdbscan = function(mat, minPts = 5, ...) {
 	
 	check_pkg("dbscan", bioc = FALSE)
@@ -304,17 +269,12 @@ cluster_by_hdbscan = function(mat, minPts = 5, ...) {
 	dbscan::hdbscan(mat, minPts = minPts, ...)$cluster
 }
 
-# == title
-# Cluster similarity matrix by MCL
-#
-# == param
-# -mat The similarity matrix.
-# -addLoops Passed to the ``addLoops`` argument in `MCL::mcl`.
-# -... Other arguments passed to `MCL::mcl`.
-#
-# == value
-# A vector of cluster labels (in numeric).
-#
+#' @param addLoops Passed to the `addLoops` argument in [`MCL::mcl()`].
+#' @details
+#' `cluster_by_MCL()`: All other arguments are passed from `...` to [`MCL::mcl()`].
+#' 
+#' @export
+#' @rdname cluster_terms
 cluster_by_MCL = function(mat, addLoops = TRUE, ...) {
 	
 	check_pkg("MCL", bioc = FALSE)

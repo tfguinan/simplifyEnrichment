@@ -1,52 +1,47 @@
 
 
-# == title
-# Simplify Gene Ontology (GO) enrichment results
-#
-# == param
-# -mat A GO similarity matrix.
-# -method Method for clustering the matrix. See `cluster_terms`.
-# -control A list of parameters for controlling the clustering method, passed to `cluster_terms`.
-# -plot Whether to make the heatmap.
-# -column_title Column title for the heatmap.
-# -verbose Whether to print messages.
-# -ht_list A list of additional heatmaps added to the left of the similarity heatmap.
-# -... Arguments passed to `ht_clusters`.
-#
-# == details
-# This is basically a wrapper function that it first runs `cluster_terms` to cluster
-# GO terms and then runs `ht_clusters` to visualize the clustering.
-#
-# The arguments in `simplifyGO` passed to `ht_clusters` are:
-#
-# -``draw_word_cloud`` Whether to draw the word clouds.
-# -``min_term`` Minimal number of GO terms in a cluster. All the clusters
-#     with size less than ``min_term`` are all merged into one single cluster in the heatmap.
-# -``order_by_size`` Whether to reorder GO clusters by their sizes. The cluster
-#      that is merged from small clusters (size < ``min_term``) is always put to the bottom of the heatmap.
-# -``stat`` What values of keywords are used to map to font sizes in the word clouds.
-# -``exclude_words`` Words that are excluded in the word cloud.
-# -``max_words`` Maximal number of words visualized in the word cloud.
-# -``word_cloud_grob_param`` A list of graphic parameters passed to `word_cloud_grob`.
-# -``fontsize_range`` The range of the font size. The value should be a numeric vector with length two.
-#       The minimal font size is mapped to word frequency value of 1 and the maximal font size is mapped
-#       to the maximal word frequency. The font size interlopation is linear.
-# -``bg_gp`` Graphic parameters for controlling the background of word cloud annotations.
-#
-# == value
-# A data frame with two columns: GO IDs and cluster labels.
-#
-# == seealso
-# `simplifyGOFromMultipleLists` which performs simplifyGO analysis with multiple lists of GO IDs.
-#
-# == example
-# \donttest{
-# set.seed(123)
-# go_id = random_GO(500)
-# mat = GO_similarity(go_id)
-# df = simplifyGO(mat, word_cloud_grob_param = list(max_width = 80))
-# head(df)
-# }
+#' Simplify Gene Ontology (GO) enrichment results
+#'
+#' @param mat A GO similarity matrix. You can also provide a vector of GO IDs to this argument.
+#' @param method Method for clustering the matrix. See [`cluster_terms()`].
+#' @param control A list of parameters for controlling the clustering method, passed to [`cluster_terms()`].
+#' @param plot Whether to make the heatmap.
+#' @param column_title Column title for the heatmap.
+#' @param verbose Whether to print messages.
+#' @param ht_list A list of additional heatmaps added to the left of the similarity heatmap.
+#' @param ... Arguments passed to [`ht_clusters()`].
+#'
+#' @details
+#' This is basically a wrapper function that it first runs [`cluster_terms()`] to cluster
+#' GO terms and then runs [`ht_clusters()`] to visualize the clustering.
+#'
+#' The arguments in `simplifyGO()` passed to `ht_clusters()` are:
+#'
+#' - `draw_word_cloud`: Whether to draw the word clouds.
+#' - `min_term`: Minimal number of GO terms in a cluster. All the clusters
+#'     with size less than `min_term` are all merged into one single cluster in the heatmap.
+#' - `order_by_size`: Whether to reorder GO clusters by their sizes. The cluster
+#'      that is merged from small clusters (size < `min_term`) is always put to the bottom of the heatmap.
+#' - `stat`: What values of keywords are used to map to font sizes in the word clouds.
+#' - `exclude_words`: Words that are excluded in the word cloud.
+#' - `max_words`: Maximal number of words visualized in the word cloud.
+#' - `word_cloud_grob_param`: A list of graphic parameters passed to [`word_cloud_grob()`].
+#' - `fontsize_range` The range of the font size. The value should be a numeric vector with length two.
+#'       The minimal font size is mapped to word frequency value of 1 and the maximal font size is mapped
+#'       to the maximal word frequency. The font size interlopation is linear.
+#' - `bg_gp`: Graphic parameters for controlling the background of word cloud annotations.
+#'
+#' @return
+#' A data frame with two columns: GO IDs and cluster labels.
+#' @export
+#' @examples
+#' \donttest{
+#' set.seed(123)
+#' go_id = random_GO(500)
+#' mat = GO_similarity(go_id)
+#' df = simplifyGO(mat, word_cloud_grob_param = list(max_width = 80))
+#' head(df)
+#' }
 simplifyGO = function(mat, method = "binary_cut", control = list(), 
 	plot = TRUE, verbose = TRUE, 
 	column_title = qq("@{nrow(mat)} GO terms clustered by '@{method}'"),
@@ -76,122 +71,95 @@ simplifyGO = function(mat, method = "binary_cut", control = list(),
 	return(invisible(data.frame(id = go_id, cluster = cl, stringsAsFactors = FALSE)))
 }
 
-# == title
-# Simplify functional enrichment results
-#
-# == param
-# -mat A similarity matrix.
-# -method Method for clustering the matrix. See `cluster_terms`.
-# -control A list of parameters for controlling the clustering method, passed to `cluster_terms`.
-# -plot Whether to make the heatmap.
-# -column_title Column title for the heatmap.
-# -verbose Whether to print messages.
-# -ht_list A list of additional heatmaps added to the left of the similarity heatmap.
-# -... Arguments passed to `ht_clusters`.
-#
-# == details
-# The usage is the same as `simplifyGO`.
-#
-simplifyEnrichment = function(mat, method = "binary_cut", control = list(), 
-	plot = TRUE, verbose = TRUE, 
-	column_title = qq("@{nrow(mat)} terms clustered by '@{method}'"),
-	ht_list = NULL, ...) {
-	
-	cl = do.call(cluster_terms, list(mat = mat, method = method, verbose = verbose, control = control))
-	term_id = rownames(mat)
-	if(is.null(term_id)) {
-		term_id = paste0("row_", 1:nrow(mat))
-	}
-	
-	if(plot) ht_clusters(mat, cl, column_title = column_title, ht_list = ht_list, ...)
 
-	return(invisible(data.frame(id = term_id, cluster = cl, stringsAsFactors = FALSE)))
+#' @export
+#' @rdname simplifyGO
+simplifyEnrichment = function(...) {
+	message("From version 2.0.0, `simplifyEnrichment()` is identical to `simplifyGO()`.")
+	simplifyGO(...)
 }
 
-# == title
-# Perform simplifyGO analysis with multiple lists of GO IDs
-#
-# == param
-# -lt A data frame, a list of numeric vectors (e.g. adjusted p-values) where each numeric vector has GO IDs as names, or a list of GO IDs.
-# -go_id_column Column index of GO ID if ``lt`` contains a list of data frames.
-# -padj_column Column index of adjusted p-values if ``lt`` contains a list of data frames.
-# -padj_cutoff Cut off for adjusted p-values
-# -filter A self-defined function for filtering GO IDs. By default it requires GO IDs should be significant in at least one list.
-# -default The default value for the adjusted p-values. See Details.
-# -ont GO ontology. Value should be one of "BP", "CC" or "MF". If it is not specified,
-#      the function automatically identifies it by random sampling 10 IDs from ``go_id`` (see `guess_ont`).
-# -db Annotation database. It should be from https://bioconductor.org/packages/3.10/BiocViews.html#___OrgDb
-# -measure Semantic measure for the GO similarity, pass to `GOSemSim::termSim`.
-# -heatmap_param Parameters for controlling the heatmap, see Details.
-# -show_barplot Whether draw barplots which shows numbers of significant GO terms in clusters.
-# -method Pass to `simplifyGO`.
-# -control Pass to `simplifyGO`.
-# -min_term Pass to `simplifyGO`.
-# -verbose Pass to `simplifyGO`.
-# -column_title Pass to `simplifyGO`.
-# -... Pass to `simplifyGO`.
-#
-# == Details
-# The input data can have three types of formats:
-#
-# - A list of numeric vectors of adjusted p-values where each vector has the GO IDs as names.
-# - A data frame. The column of the GO IDs can be specified with ``go_id_column`` argument and the column of the adjusted p-values can be
-#      specified with ``padj_column`` argument. If these columns are not specified, they are automatically identified. The GO ID column
-#      is found by checking whether a column contains all GO IDs. The adjusted p-value column is found by comparing the column names of the 
-#      data frame to see whether it might be a column for adjusted p-values. These two columns are used to construct a numeric vector
-#      with GO IDs as names.
-# - A list of character vectors of GO IDs. In this case, each character vector is changed to a numeric vector where
-#   all values take 1 and the original GO IDs are used as names of the vector.
-#
-# Now let's assume there are ``n`` GO lists, we first construct a global matrix where columns correspond to the ``n`` GO lists and rows correspond
-# to the "union" of all GO IDs in the lists. The value for the ith GO ID and in the jth list are taken from the corresponding numeric vector
-# in ``lt``. If the jth vector in ``lt`` does not contain the ith GO ID, the value defined by ``default`` argument is taken there (e.g. in most cases the numeric
-# values are adjusted p-values, ``default`` is set to 1). Let's call this matrix as ``M0``.
-#
-# Next step is to filter ``M0`` so that we only take a subset of GO IDs of interest. We define a proper function via argument ``filter`` to remove
-# GO IDs that are not important for the analysis. Functions for ``filter`` is applied to every row in ``M0`` and ``filter`` function needs
-# to return a logical value to decide whether to remove the current GO ID. For example, if the values in ``lt`` are adjusted p-values, the ``filter`` function
-# can be set as ``function(x) any(x < padj_cutoff)`` so that the GO ID is kept as long as it is signfiicant in at least one list. After the filter, let's call
-# the filtered matrix ``M1``.
-#
-# GO IDs in ``M1`` (row names of ``M1``) are used for clustering. A heatmap of ``M1`` is attached to the left of the GO similarity heatmap so that
-# the group-specific (or list-specific) patterns can be easily observed and to corresponded to GO functions.
-#
-# Argument ``heatmap_param`` controls several parameters for heatmap ``M1``:
-#
-# - ``transform``: A self-defined function to transform the data for heatmap visualization. The most typical case is to transform adjusted p-values by ``-log10(x)``.
-# - ``breaks``: break values for color interpolation.
-# - ``col``: The corresponding values for ``breaks``.
-# - ``labels``: The corresponding labels.
-# - ``name``: Legend title.
-#
-# == example
-# \donttest{
-# # perform functional enrichment on the signatures genes from cola anlaysis 
-# require(cola)
-# data(golub_cola) 
-# res = golub_cola["ATC:skmeans"]
-# require(hu6800.db)
-# x = hu6800ENTREZID
-# mapped_probes = mappedkeys(x)
-# id_mapping = unlist(as.list(x[mapped_probes]))
-# lt = functional_enrichment(res, k = 3, id_mapping = id_mapping) # you can check the value of `lt`
-#
-# # a list of data frames
-# simplifyGOFromMultipleLists(lt, padj_cutoff = 0.001)
-#
-# # a list of numeric values
-# lt2 = lapply(lt, function(x) structure(x$p.adjust, names = x$ID))
-# simplifyGOFromMultipleLists(lt2, padj_cutoff = 0.001)
-#
-# # a list of GO IDS
-# lt3 = lapply(lt, function(x) x$ID[x$p.adjust < 0.001])
-# simplifyGOFromMultipleLists(lt3)
-# }
+#' Perform simplifyGO analysis with multiple lists of GO IDs
+#'
+#' @param lt A data frame, a list of numeric vectors (e.g. adjusted p-values) where each numeric vector has GO IDs as names, or a list of GO IDs.
+#' @param go_id_column Column index of GO ID if `lt` contains a list of data frames.
+#' @param padj_column Column index of adjusted p-values if `lt` contains a list of data frames.
+#' @param padj_cutoff Cut off for adjusted p-values.
+#' @param filter A self-defined function for filtering GO IDs. By default it requires GO IDs should be significant in at least one list.
+#' @param default The default value for the adjusted p-values. See **Details**.
+#' @param ont Pass to [`GO_similarity()`].
+#' @param db Pass to [`GO_similarity()`].
+#' @param measure Pass to [`GO_similarity()`].
+#' @param heatmap_param Parameters for controlling the heatmap, see **Details**.
+#' @param show_barplot Whether draw barplots which shows numbers of significant GO terms in clusters.
+#' @param method Pass to [`simplifyGO()`].
+#' @param control Pass to [`simplifyGO()`].
+#' @param min_term Pass to [`simplifyGO()`].
+#' @param verbose Pass to [`simplifyGO()`].
+#' @param column_title Pass to [`simplifyGO()`].
+#' @param ... Pass to [`simplifyGO()`].
+#'
+#' @details
+#' The input data can have three types of formats:
+#'
+#' - A list of numeric vectors of adjusted p-values where each vector has the GO IDs as names.
+#' - A data frame. The column of the GO IDs can be specified with `go_id_column` argument and the column of the adjusted p-values can be
+#'      specified with `padj_column` argument. If these columns are not specified, they are automatically identified. The GO ID column
+#'      is found by checking whether a column contains all GO IDs. The adjusted p-value column is found by comparing the column names of the 
+#'      data frame to see whether it might be a column for adjusted p-values. These two columns are used to construct a numeric vector
+#'      with GO IDs as names.
+#' - A list of character vectors of GO IDs. In this case, each character vector is changed to a numeric vector where
+#'   all values take 1 and the original GO IDs are used as names of the vector.
+#'
+#' Now let's assume there are `n` GO lists, we first construct a global matrix where columns correspond to the `n` GO lists and rows correspond
+#' to the "union" of all GO IDs in the lists. The value for the ith GO ID and in the jth list are taken from the corresponding numeric vector
+#' in `lt`. If the jth vector in `lt` does not contain the ith GO ID, the value defined by `default` argument is taken there (e.g. in most cases the numeric
+#' values are adjusted p-values, `default` is set to 1). Let's call this matrix as `M0`.
+#'
+#' Next step is to filter `M0` so that we only take a subset of GO IDs of interest. We define a proper function via argument `filter` to remove
+#' GO IDs that are not important for the analysis. Functions for `filter` is applied to every row in `M0` and `filter` function needs
+#' to return a logical value to decide whether to remove the current GO ID. For example, if the values in `lt` are adjusted p-values, the `filter` function
+#' can be set as `function(x) any(x < padj_cutoff)` so that the GO ID is kept as long as it is signfiicant in at least one list. After the filter, let's call
+#' the filtered matrix `M1`.
+#'
+#' GO IDs in `M1` (row names of `M1`) are used for clustering. A heatmap of `M1` is attached to the left of the GO similarity heatmap so that
+#' the group-specific (or list-specific) patterns can be easily observed and to corresponded to GO functions.
+#'
+#' Argument `heatmap_param` controls several parameters for heatmap `M1`:
+#'
+#' - `transform`: A self-defined function to transform the data for heatmap visualization. The most typical case is to transform adjusted p-values by `-log10(x)`.
+#' - `breaks`: break values for color interpolation.
+#' - `col`: The corresponding values for `breaks`.
+#' - `labels`: The corresponding labels.
+#' - `name`: Legend title.
+#' @export
+#' @examples
+#' \donttest{
+#' # perform functional enrichment on the signatures genes from cola anlaysis 
+#' require(cola)
+#' data(golub_cola) 
+#' res = golub_cola["ATC:skmeans"]
+#' require(hu6800.db)
+#' x = hu6800ENTREZID
+#' mapped_probes = mappedkeys(x)
+#' id_mapping = unlist(as.list(x[mapped_probes]))
+#' lt = functional_enrichment(res, k = 3, id_mapping = id_mapping) # you can check the value of `lt`
+#'
+#' # a list of data frames
+#' simplifyGOFromMultipleLists(lt, padj_cutoff = 0.001)
+#'
+#' # a list of numeric values
+#' lt2 = lapply(lt, function(x) structure(x$p.adjust, names = x$ID))
+#' simplifyGOFromMultipleLists(lt2, padj_cutoff = 0.001)
+#'
+#' # a list of GO IDS
+#' lt3 = lapply(lt, function(x) x$ID[x$p.adjust < 0.001])
+#' simplifyGOFromMultipleLists(lt3)
+#' }
 simplifyGOFromMultipleLists = function(lt, go_id_column = NULL, 
 	padj_column = NULL, padj_cutoff = 1e-2,
 	filter = function(x) any(x < padj_cutoff), default = 1, 
-	ont = NULL, db = 'org.Hs.eg.db', measure = "Rel",
+	ont = NULL, db = 'org.Hs.eg.db', measure = "Sim_XGraSM_2013",
 	heatmap_param = list(NULL), show_barplot = TRUE,
 	method = "binary_cut", control = list(), 
 	min_term = NULL, verbose = TRUE, column_title = NULL, ...) {
@@ -414,4 +382,7 @@ test_padj_column = function(cn) {
 	return(NULL)
 }
 
+help_msg = function(fun) {
+	
+}
 

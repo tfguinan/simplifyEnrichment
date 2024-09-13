@@ -2,14 +2,6 @@
 title: "Word Cloud Annotation"
 author: "Zuguang Gu (z.gu@dkfz.de)"
 date: '`r Sys.Date()`'
-output: 
-  rmarkdown::html_vignette:
-    fig_caption: true
-    css: main.css
-vignette: >
-  %\VignetteIndexEntry{Word Cloud Annotation}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, echo = FALSE}

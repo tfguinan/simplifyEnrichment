@@ -1,34 +1,35 @@
 
-# == title
-# A simplified way to visualize enrichment in GO clusters
-#
-# == param
-# -go_id A vector of GO IDs.
-# -value A list of numeric value associate with ``go_id``. We suggest to use -log10(p.adjust) or -log2(fold enrichment) as the values.
-# -aggregate Function to aggregate values in each GO cluster.
-# -method Method for clustering the matrix. See `cluster_terms`.
-# -control A list of parameters for controlling the clustering method, passed to `cluster_terms`.
-# -verbose Whether to print messages.
-# -axis_label X-axis label.
-# -title Title for the whole plot.
-# -legend_title Title for the legend.
-# -min_term Minimal number of functional terms in a cluster. All the clusters
-#     with size less than ``min_term`` are all merged into one separated cluster in the heatmap.
-# -stat Type of value for mapping to the font size of keywords in the word clouds. There are two options:
-#       "count": simply number of keywords; "pvalue": enrichment on keywords is performed (by fisher's exact test) and -log10(pvalue) is used to map to font sizes.
-# -min_stat Minimal value for ``stat`` for selecting keywords.
-# -exclude_words Words that are excluded in the word cloud.
-# -max_words Maximal number of words visualized in the word cloud.
-# -word_cloud_grob_param A list of graphic parameters passed to `word_cloud_grob`.
-# -fontsize_range The range of the font size. The value should be a numeric vector with length two.
-#       The font size interpolation is linear.
-# -bg_gp Graphics parameters for controlling word cloud annotation background.
-#
-# == details
-# There are several other ways to specify GO IDs and the associated values.
-#
-# 1. specify ``value`` as a named vector where GO IDs are the names.
-# 2. specify ``value`` as a list of numeric named vectors. In this case, ``value`` contains multiple enrichment results.
+#' A simplified way to visualize enrichment in GO clusters
+#'
+#' @param go_id A vector of GO IDs.
+#' @param value A list of numeric value associate with `go_id`. We suggest to use `-log10(p.adjust)` or `-log2(fold enrichment)` as the values.
+#' @param aggregate Function to aggregate values in each GO cluster.
+#' @param method Method for clustering the matrix. See [`cluster_terms()`].
+#' @param control A list of parameters for controlling the clustering method, passed to [`cluster_terms()`].
+#' @param verbose Whether to print messages.
+#' @param axis_label X-axis label.
+#' @param title Title for the whole plot.
+#' @param legend_title Title for the legend.
+#' @param min_term Minimal number of functional terms in a cluster. All the clusters
+#'     with size less than `min_term` are all merged into one separated cluster in the heatmap.
+#' @param stat Type of value for mapping to the font size of keywords in the word clouds. There are two options:
+#'       "count": simply number of keywords; "pvalue": enrichment on keywords is performed (by fisher's exact test) and -log10(pvalue) is used to map to font sizes.
+#' @param min_stat Minimal value for `stat` for selecting keywords.
+#' @param exclude_words Words that are excluded in the word cloud.
+#' @param max_words Maximal number of words visualized in the word cloud.
+#' @param word_cloud_grob_param A list of graphic parameters passed to `word_cloud_grob`.
+#' @param fontsize_range The range of the font size. The value should be a numeric vector with length two.
+#'       The font size interpolation is linear.
+#' @param bg_gp Graphics parameters for controlling word cloud annotation background.
+#'
+#' @details
+#' There are several other ways to specify GO IDs and the associated values.
+#'
+#' 1. specify `value` as a named vector where GO IDs are the names.
+#' 2. specify `value` as a list of numeric named vectors. In this case, `value` contains multiple enrichment results.
+#' 
+#' Please refer to \url{https://jokergoo.github.io/2023/10/02/simplified-simplifyenrichment-plot/} for more examples of this function.
+#' @export
 summarizeGO = function(go_id, value = NULL, aggregate = mean, 
 	method = "binary_cut", control = list(), verbose = TRUE, 
 	axis_label = "Value", title = "", legend_title = axis_label,

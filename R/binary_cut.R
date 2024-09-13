@@ -5,18 +5,16 @@ dend_max_depth = function(dend) {
 	})))
 }
 
-# == title
-# Area above the eCDF curve
-#
-# == param
-# -x A vector of similarity values.
-#
-# == details
-# Denote F(x) as the eCDF (empirical Cumulative Distribution Function) of the similarity vector ``x``, this function calculates
-# the area above the eCDF curve, which is 1 - \\int_0^1 F(x)dx.
-#
-# == value
-# A numeric value.
+#' Area above the eCDF curve
+#'
+#' @param x A vector of similarity values.
+#'
+#' @details
+#' Denote `F(x)` as the eCDF (empirical Cumulative Distribution Function) of the similarity vector `x`, 
+#' this function calculates the area above the eCDF curve, which is `1 - \int_0^1 F(x)dx`.
+#'
+#' @returns
+#' A numeric value.
 area_above_ecdf = function(x) { 
 	f = ecdf(x)
 	i = 1:100/100
@@ -27,6 +25,8 @@ area_above_ecdf = function(x) {
 # two scores attached to each ndoe
 # - score: the original score
 # - score2: the score which have checked the children nodes' scores
+
+#' @import stats
 cluster_mat = function(mat, value_fun = area_above_ecdf, partition_fun = partition_by_pam, cutoff = 0.85) {
 
 	dend = NULL
@@ -398,6 +398,7 @@ cut_dend = function(dend, cutoff = 0.85, field = "score2", return = "cluster") {
 	}
 }
 
+#' @importFrom circlize colorRamp2
 render_dend = function(dend, field = "score2", cutoff = 0.85, align_leaf = FALSE, 
 	depth = NULL, add_label = FALSE) {
 
@@ -466,41 +467,37 @@ render_dend = function(dend, field = "score2", cutoff = 0.85, align_leaf = FALSE
 
 dend_env = new.env()
 
-# == title
-# Visualize the process of binary cut
-#
-# == param
-# -mat The similarity matrix.
-# -value_fun A function that calculates the scores for the four submatrices on a node.
-# -cutoff The cutoff for splitting the dendrogram.
-# -partition_fun A function to split each node into two groups. Pre-defined functions
-#                in this package are `partition_by_kmeanspp`, `partition_by_pam` and `partition_by_hclust`.
-# -dend A dendrogram object, used internally.
-# -depth Depth of the recursive binary cut process.
-# -dend_width Width of the dendrogram on the plot.
-# -show_heatmap_legend Whether to show the heatmap legend.
-# -... Other arguments.
-#
-# == details
-# After the functions which perform clustering are executed, such as `simplifyGO` or
-# `binary_cut`, the dendrogram is temporarily saved and `plot_binary_cut` directly
-# uses this dendrogram.
-#
-# == example
-# \donttest{
-# mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", 
-#     package = "simplifyEnrichment"))
-# plot_binary_cut(mat, depth = 1)
-# plot_binary_cut(mat, depth = 2)
-# plot_binary_cut(mat)
-# }
+#' @param dend A dendrogram object, used internally.
+#' @param depth Depth of the recursive binary cut process.
+#' @param dend_width Width of the dendrogram on the plot.
+#' @param show_heatmap_legend Whether to show the heatmap legend.
+#' @param ... Other arguments.
+#'
+#' @details
+#' After the functions which perform clustering are executed, such as `simplifyGO()` or
+#' `binary_cut()`, the dendrogram is temporarily saved and `plot_binary_cut()` directly
+#' uses this dendrogram.
+#'
+#' @rdname binary_cut
+#' @export
+#' @importFrom digest digest
+#' @import ComplexHeatmap
+#' @import grid
+#' @examples
+#' \donttest{
+#' mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds", 
+#'     package = "simplifyEnrichment"))
+#' plot_binary_cut(mat, depth = 1)
+#' plot_binary_cut(mat, depth = 2)
+#' plot_binary_cut(mat)
+#' }
 plot_binary_cut = function(mat, value_fun = area_above_ecdf, cutoff = 0.85, 
 	partition_fun = partition_by_pam, dend = NULL, dend_width = unit(3, "cm"),
 	depth = NULL, show_heatmap_legend = TRUE, ...) {
 
 	check_pkg("gridGraphics", bioc = FALSE)
 
-	hash = digest::digest(list(mat, value_fun, partition_fun, cutoff))
+	hash = digest(list(mat, value_fun, partition_fun, cutoff))
 
 	# if it was already generated
 	if(is.null(dend)) {
@@ -563,31 +560,32 @@ plot_binary_cut = function(mat, value_fun = area_above_ecdf, cutoff = 0.85,
 	})
 }
 
-# == title
-# Cluster functional terms by recursively binary cutting the similarity matrix
-#
-# == param
-# -mat A similarity matrix.
-# -value_fun A function that calculates the scores for the four submatrices on a node.
-# -partition_fun A function to split each node into two groups. Pre-defined functions
-#                in this package are `partition_by_kmeanspp`, `partition_by_pam`  and `partition_by_hclust`.
-# -cutoff The cutoff for splitting the dendrogram.
-# -try_all_partition_fun Different ``partition_fun`` gives different clusterings. If the vaule
-#      of ``try_all_partition_fun`` is set to ``TRUE``, the similarity matrix is clustered by three
-#      partitioning method: `partition_by_pam`, `partition_by_kmeanspp` and `partition_by_hclust`.
-#      The clustering with the highest difference score is finally selected as the final clustering.
-# -partial Whether to generate the complete clustering or the clustering stops when sub-matrices
-#     cannot be split anymore.
-#
-# == value
-# A vector of cluster labels (in numeric). 
-#
-# == example
-# mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
-#     package = "simplifyEnrichment"))
-# binary_cut(mat)
-binary_cut = function(mat, value_fun = area_above_ecdf, partition_fun = partition_by_pam,
-	cutoff = 0.85, try_all_partition_fun = FALSE, partial = FALSE) {
+#' Cluster functional terms by recursively binary cutting the similarity matrix
+#'
+#' @param mat A similarity matrix.
+#' @param value_fun A function that calculates the scores for the four submatrices on a node.
+#' @param partition_fun A function to split each node into two groups. Pre-defined functions
+#'                in this package are [`partition_by_kmeanspp()`], [`partition_by_pam()`]  and [`partition_by_hclust()`].
+#' @param cutoff The cutoff for splitting the dendrogram.
+#' @param try_all_partition_fun Different `partition_fun` may give different clusterings. If the vaule
+#'      of `try_all_partition_fun` is set to `TRUE`, the similarity matrix is clustered by three
+#'      partitioning method: `partition_by_pam()`, `partition_by_kmeanspp()` and `partition_by_hclust()`.
+#'      The clustering with the highest difference score is finally selected as the final clustering.
+#' @param partial Whether to generate the complete clustering or the clustering stops when sub-matrices
+#'     cannot be split anymore.
+#'
+#' @returns
+#' `binary_cut()` returns a vector of numeric cluster labels. 
+#' 
+#' @rdname binary_cut
+#' @export
+#'
+#' @examples
+#' mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
+#'     package = "simplifyEnrichment"))
+#' binary_cut(mat)
+binary_cut = function(mat, value_fun = area_above_ecdf, partition_fun = partition_by_hclust,
+	cutoff = 0.85, try_all_partition_fun = TRUE, partial = nrow(mat) > 1500) {
 
 	if(try_all_partition_fun) {
 		clt = list(
@@ -614,31 +612,32 @@ binary_cut = function(mat, value_fun = area_above_ecdf, partition_fun = partitio
 	return(as.numeric(as.vector(unname(cl))))
 }
 
-# == title
-# Select the cutoff for binary cut
-#
-# == param
-# -mat A similarity matrix.
-# -cutoff A list of cutoffs to test. Note the range of the cutoff values should be inside [0.5, 1].
-# -verbose Whether to print messages.
-# -... Pass to `binary_cut`.
-#
-# == details
-# Binary cut is applied to each of the cutoff and the clustering results are evaluated by following metrics:
-#
-# - difference score, calculated by `difference_score`.
-# - number of clusters.
-# - block mean, which is the mean similarity in the blocks in the diagonal of the heatmap.
-#
-# == example
-# \donttest{
-# mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
-#     package = "simplifyEnrichment"))
-# select_cutoff(mat)
-# }
-select_cutoff = function(mat, cutoff = seq(0.6, 0.98, by = 0.01), verbose = TRUE, ...) {
+#' Select the cutoff for binary cut
+#'
+#' @param mat A similarity matrix.
+#' @param cutoff A list of cutoffs to test. Note the range of the cutoff values should be inside `[0.5, 1]`.
+#' @param verbose Whether to print messages.
+#' @param ... Pass to [`binary_cut()`].
+#'
+#' @details
+#' Binary cut is applied to each cutoff and the clustering results are evaluated by following metrics:
+#'
+#' - difference score, calculated by [`difference_score()`].
+#' - number of clusters.
+#' - block mean, which is the mean similarity in the blocks in the diagonal of the heatmap.
+#' @export
+#' @examples
+#' \donttest{
+#' mat = readRDS(system.file("extdata", "random_GO_BP_sim_mat.rds",
+#'     package = "simplifyEnrichment"))
+#' select_cutoff(mat)
+#' }
+select_cutoff = function(mat, cutoff = seq(0.6, 0.98, by = 0.01), verbose = se_opt$verbose, ...) {
 
 	cutoff = cutoff[cutoff >= 0.5 & cutoff <= 1]
+	if(length(cutoff) == 0) {
+		stop("`cutoff` should be within [0.5, 1].")
+	}
 
 	s1 = s2 = s3 = s4 = NULL
 	for(i in seq_along(cutoff)) {
