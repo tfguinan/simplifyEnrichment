@@ -1,3 +1,14 @@
+# A fork of simplifyEnrichment to increase the width of simplifyGOFromMultipleLists bar plots
+
+Install this fork with:
+
+```r
+library(devtools)
+install_github("tfguinan/simplifyEnrichment")
+```
+
+Please refer to and credit the original package and author.
+
 # Simplify Functional Enrichment Results
 
 [![R-CMD-check](https://github.com/jokergoo/simplifyEnrichment/workflows/R-CMD-check/badge.svg)](https://github.com/jokergoo/simplifyEnrichment/actions)
